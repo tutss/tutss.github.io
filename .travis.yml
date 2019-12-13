@@ -1,0 +1,11 @@
+language: python
+branches:
+  only:
+  - src
+install:
+- pip install -r requirements.txt
+script:
+- make github
+env:
+  global:
+    secure: iMg8mEBjZLM74+xwB08/r5od1Y+h5bl5ygXFRFMFYN3tFv4/qsXOTxuTZj2eAn7k+QcVeCOSQslmlgS8tlcqvQS8m1cERk3KjoF/v7dB3oVU5LSXuvQ28hoFsbAAKzZndFsocrEL9nJWTWuTSo6Eo9RzvkJ6cI2dB1QM2OwHbaOvV/bwqJYigwYH0AnQJyQgt8dOJ2YaiQUDLAgCCmnSbP8nb1t4CT53L3K34RVuoVCB5bsu3Rv+GCKhd3GfaJo6H1OOEph2HTL91RirTkNzi8SgmiEAwbnNz94aMVTdiwNRu57SKpzzK9NDb29NAYvbWiCIqT6cAFf7lfDtOA/pguyh68AnsyeO1aTpKH7Av9KJ1RfOSK4270ooDhWUkcLZOIYswTYvtnBCXf5oDHzUgz90CC3b/wd9WtdpjL4ppRxcx4dMHprOZ/BiBHCRVGaxR774gd+Y4ZbdAWTSZly+eMcemo6QN8Us33KUNvyosPEpE0h7yZxjjUty+lSaGWkxUsJCUf/UuQSPVh/m83hbaRcesO7nMRqtq51y1nFpq0OZZPiDgMYDSGU6vga5Zskwqu7UP2coYd0ZODcUWXEk5xuSBW3QgNFie2oT5vZ8TNAvkfYzf6UrMCW6J0WI1qEv7wAGX5dB4u3MnFiig2/dGbrGnkSMh+ffhisnoU/I2i0=
