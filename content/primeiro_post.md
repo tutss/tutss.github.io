@@ -1,6 +1,6 @@
 Title: Primeiro post do blog!
 Date: 2015-05-02 15:50
-Category: hello world
+Category: Blog
 Tags: hello world, pelican
 Author: Artur Magalhães
 
