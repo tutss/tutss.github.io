@@ -20,14 +20,14 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Pelican', 'http://getpelican.com/'),
-         ('Python.org', 'http://python.org/'),
-         ('Jinja2', 'http://jinja.pocoo.org/'),
-         ('You can modify those links in your config file', '#'),)
+# LINKS = (('Pelican', 'http://getpelican.com/'),
+        # ('Python.org', 'http://python.org/'),
+        # ('Jinja2', 'http://jinja.pocoo.org/'),
+        # ('You can modify those links in your config file', '#'),)
 
 # Social widget
-SOCIAL = (('LinkedIn', '#'),
-          ('Another social link', '#'),)
+SOCIAL = (('LinkedIn', 'https://www.linkedin.com/in/arturmrsantos/'),
+          ('Github', 'https://github.com/tutss'),)
 
 DEFAULT_PAGINATION = 10
 
