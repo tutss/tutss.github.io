@@ -14,9 +14,9 @@ PATH = 'content'
 THEME = 'zurb-F5-basic'
 
 # Articles and pages paths
-ARTICLE_URL = 'posts/{date:%Y}/{date:%b}/{date:%d}/{slug}/'
+ARTICLE_URL = 'posts/{date:%Y}/{date:%b}/{date:%d}/{slug}'
 ARTICLE_SAVE_AS = 'posts/{date:%Y}/{date:%b}/{date:%d}/{slug}.html'
-PAGE_URL = 'pages/{slug}/'
+PAGE_URL = 'pages/{slug}'
 PAGE_SAVE_AS = 'pages/{slug}.html'
 
 # Language and hour configs
