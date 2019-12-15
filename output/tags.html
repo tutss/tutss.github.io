@@ -1,45 +1,102 @@
 <!DOCTYPE html>
-<html lang="pt-br">
 <head>
-        <meta charset="utf-8" />
-        <title>Tuts Blog - Tags</title>
-        <link rel="stylesheet" href="/theme/css/main.css" />
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Tuts Blog</title>
+
+    <link rel="stylesheet" href="/theme/css/normalize.css" />
+    <link rel="stylesheet" href="/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="/theme/css/style.css" />
+    <link rel="stylesheet" href="/theme/css/pygments.css" />	
+    <script src="/theme/js/modernizr.js"></script>
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="/">Tuts Blog </a></h1>
-                <nav><ul>
-                    <li><a href="/category/blog.html">Blog</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
+<body>
 
-<section id="content" class="body">
-    <h1>Tags for Tuts Blog</h1>
-    <ul>
-        <li><a href="/tag/hello-world.html">hello world</a> (1)</li>
-        <li><a href="/tag/pelican.html">pelican</a> (1)</li>
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="">Tuts Blog</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+            <li><a href="/pages/about-me/" class="button secondary small">About me</a></li>
     </ul>
-</section>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
 
-        <section id="extras" class="body">
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
 
-                            <li><a href="https://www.linkedin.com/in/arturmrsantos/">LinkedIn</a></li>
-                            <li><a href="https://github.com/tutss">Github</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
+<!-- Main Page Content and Sidebar -->
+<div class="row">
 
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
-                </address><!-- /#about -->
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
 
-                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
+<ul class="circle">
+	<li><a href="/tag/hello-world.html">hello world</a></li>
+	<ul class="square">
+	<li><a href="/posts/2019/dez/12/primeiro-post-do-blog/"><small>Primeiro post do blog!</small></li>
+	</ul>
+	<li><a href="/tag/pelican.html">pelican</a></li>
+	<ul class="square">
+	<li><a href="/posts/2019/dez/12/primeiro-post-do-blog/"><small>Primeiro post do blog!</small></li>
+	</ul>
+</ul>
 
+    </div>
+    <!-- End Main Content -->
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <!-- <h5 class="sidebar-title">Site</h5> -->
+        <!-- <ul class="side-nav">
+            <li><a href="/archives.html">Archives</a>
+            <li><a href="/tags.html">Tags</a>
+        </ul> -->
+        
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/arturmrsantos/">LinkedIn</a></li>
+            <li><a href="https://github.com/tutss">Github</a></li>
+            <li><a href="mailto:artur_santos@usp.br">Email me</a></li>
+        </ul>
+
+        <!-- 		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="/category/blog.html">Blog</a></li>
+   
+        </ul>
+ -->
+
+
+    </aside> <!-- End Sidebar -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                               <p>Tuts Blog by Artur Magalhães</p>
+            </div>
+            </div>
+    </div>
+</footer>
 </body>
 </html>
