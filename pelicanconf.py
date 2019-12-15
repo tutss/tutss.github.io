@@ -11,7 +11,7 @@ STATIC_PATHS = ['extra']
 EXTRA_PATH_METADATA = {'extra/favicon.ico': {'path': 'favicon.ico'},}
 
 PATH = 'content'
-THEME = '/home/tuts/pelican-themes/zurb-F5-basic'
+# THEME = '/home/tuts/pelican-themes/zurb-F5-basic'
 
 # Articles and pages paths
 ARTICLE_URL = 'posts/{date:%Y}/{date:%b}/{date:%d}/{slug}/'
