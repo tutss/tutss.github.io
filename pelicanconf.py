@@ -7,7 +7,7 @@ SITENAME = 'Tuts Blog'
 SITEURL = ''
 
 # Favicon load
-STATIC_PATHS = ['extra']
+STATIC_PATHS = ['extra', 'images']
 EXTRA_PATH_METADATA = {'extra/favicon.ico': {'path': 'favicon.ico'},}
 
 PATH = 'content'
@@ -30,6 +30,7 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+SUMMARY_MAX_LENGTH = 30
 
 # Blogroll
 # LINKS = (('Pelican', 'http://getpelican.com/'),
