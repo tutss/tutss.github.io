@@ -1,5 +1,5 @@
 Title: Experiência trabalhando em uma startup de alto crescimento
-Date: 2019-12-19 17:50
+Date: 2019-12-19 11:50
 Category: Blog
 Tags: startup, estágio, cobli, big data
 Author: Artur Magalhães
@@ -57,9 +57,9 @@ Nesse semestre estagiando na Cobli, pude aprender muito, desde ferramentas, ling
 
 ***
 
-Meus agradecimentos a todos que estiveram comigo nesse período, em especial ao [Gustavo Momenté (DG)](https://br.linkedin.com/in/gustavovm), [Vinícius Duarte](https://br.linkedin.com/in/vinícius-pessoa-duarte-1a740794) e [Nicolau Tahan](https://br.linkedin.com/in/nicolau-tahan-751338112) por toda a paciência, dicas fundamentais, e pela amizade e parceiria. 
+Meus agradecimentos a todos que estiveram comigo nesse período, em especial ao [Gustavo Momenté (DG)](https://br.linkedin.com/in/gustavovm), [Vinícius Duarte](https://br.linkedin.com/in/vinícius-pessoa-duarte-1a740794) e [Nicolau Tahan](https://br.linkedin.com/in/nicolau-tahan-751338112) por toda a paciência, dicas fundamentais, e pela amizade e parceria. 
 
-Também ao Evandro Sanches e [Ivan Stoiev](https://br.linkedin.com/in/ivan-stoiev), que puderam me trasmitir tanto conhecimento em pouquíssimo tempo.
+Também ao [Evandro Sanches](https://br.linkedin.com/in/evandro-sanches-260537165) e [Ivan Stoiev](https://br.linkedin.com/in/ivan-stoiev), que puderam me trasmitir tanto conhecimento em pouquíssimo tempo.
 
 Também ao [Lucas Brunialti](https://br.linkedin.com/in/lucasbrunialti), pelas dicas e sugestões na construção do texto.
 
