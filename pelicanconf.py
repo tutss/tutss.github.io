@@ -7,8 +7,8 @@ SITENAME = 'Tuts Blog'
 SITEURL = ''
 
 # Favicon load
-STATIC_PATHS = ['extra/favicon.ico', 'images']
-EXTRA_PATH_METADATA = {'extra/favicon.ico': {'path': 'favicon.ico'},}
+STATIC_PATHS = ['extra/favicon.ico', 'extra/CNAME', 'images']
+EXTRA_PATH_METADATA = {'extra/favicon.ico': {'path': 'favicon.ico'}, 'extra/CNAME': {'path': 'CNAME'},}
 
 PATH = 'content'
 THEME = 'zurb-F5-basic'
