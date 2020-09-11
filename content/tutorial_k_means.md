@@ -15,7 +15,7 @@ Ao longo do notebook, são abordados:
 - Como avaliar um modelo no cenário não supervisionado?
 
 #### 3. Spectral Clustering
-- Comparar o K-Means com outro algorimto de clustering.
+- Comparar o K-Means com outro algoritmo de clustering.
 
 #### 4. K-Means aplicado ao *load_digits()* (subconjunto do MNIST)
 - Aplicar o K-Means no reconhecimento de dígitos e comparar com outros algoritmos de clustering
