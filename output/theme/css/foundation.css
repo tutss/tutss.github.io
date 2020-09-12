@@ -2790,6 +2790,7 @@ p {
   font-size: 1.2rem;
   line-height: 1.6;
   margin-bottom: 1.25rem;
+  margin-top: 1.25rem;
   text-rendering: optimizeLegibility; }
   p aside {
     font-size: 0.875rem;
