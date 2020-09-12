@@ -4,7 +4,7 @@ Category: Blog
 Tags: machine learning, data science
 Author: Artur Magalhães
 
-### Publiquei um novo notebook no Kaggle explicando (e aprendendo mais) sobre algoritmos de clustering, especialmente o K-Means.
+### Publiquei um novo notebook no Kaggle explicando (e aprendendo) sobre algoritmos de clustering, especialmente o K-Means.
 
 Ao longo do notebook, são abordados:
 
@@ -22,7 +22,7 @@ Ao longo do notebook, são abordados:
 
 ---
 
-A ideia central do algoritmo K-Means é clusterização, ou seja, dado um dataset, conseguir separar os dados em clusters, de forma a diferenciá-los com labels diferentes. É um algoritmo não supervisionado, pois não necessita de um valor real ou classificação par construir os clusters.
+A ideia central do algoritmo K-Means é **clusterização**, ou seja, dado um dataset, conseguir **separar os dados em clusters**, de forma a diferenciá-los com labels diferentes. É um algoritmo não supervisionado, pois não necessita de um valor real ou classificação par construir os clusters.
 
 Por exemplo, para um conjunto de dados distribuído como:
 
