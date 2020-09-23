@@ -8,3 +8,10 @@ e empreendedorismo.
 
 Tenho interesse especial nas áreas de Machine Learning e Inteligência Artificial.
 
+---
+
+A young computer student at the University of
+São Paulo. Passionate about computing, reading, financial markets, design
+and entrepreneurship.
+
+I have a special interest in Machine Learning and Artificial Intelligence.
