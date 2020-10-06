@@ -8,6 +8,6 @@ Nesse último fim de semana (dia 11/4) participei do [Lightning Hacks](https://l
 
 A palestra é curta (5 min, pelas regras do LH) e bem introdutória, mas de toda forma, foi super legal poder ter participado. Os slides da apresentação se encontram [aqui]({static}/slides/lh.pdf).
 
-Vídeo no Youtube:
+## Vídeo no Youtube:
 
-[![Lightning Hacks](https://img.youtube.com/vi/Hksu-zRh5_Q/0.jpg)](http://www.youtube.com/watch?v=Hksu-zRh5_Q)
+[![Lightning Hacks](https://img.youtube.com/vi/Hksu-zRh5_Q/0.jpg)](https://www.youtube.com/watch?v=Hksu-zRh5_Q)
