@@ -10,7 +10,7 @@ Tenho interesse especial nas áreas de Machine Learning e Inteligência Artifici
 
 ---
 
-A young computer student at the University of
+A young computer science student at University of
 São Paulo. Passionate about computing, reading, financial markets, design
 and entrepreneurship.
 
