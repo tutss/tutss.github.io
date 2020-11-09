@@ -38,3 +38,5 @@ O único estado onde a busca por algum termo relativo a eleições municipais se
 ---
 
 O Google Trends é uma ferramenta interessante para analisarmos, mesmo que não tão profundamente, o comportamento das buscas, possibilitando a comparação por termos. Os gráficos e mapas nos permitem avaliar, que dentre os 4 termos apresentados, o termo relativo a eleições norte-americanas supera com uma grande margem os termos relativos a eleições municipais.
+
+Até o próximo post!
