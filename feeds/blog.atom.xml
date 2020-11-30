@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Tuts Blog - Blog</title><link href="https://tutss.github.io/" rel="alternate"></link><link href="https://tutss.github.io/feeds/blog.atom.xml" rel="self"></link><id>https://tutss.github.io/</id><updated>2020-11-14T15:16:00-03:00</updated><entry><title>Não linearidade em redes neurais com Pytorch</title><link href="https://tutss.github.io/posts/2020/Nov/14/nao-linearidade-em-redes-neurais-com-pytorch" rel="alternate"></link><published>2020-11-14T15:16:00-03:00</published><updated>2020-11-14T15:16:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2020-11-14:/posts/2020/Nov/14/nao-linearidade-em-redes-neurais-com-pytorch</id><summary type="html">&lt;p&gt;Dentro do contexto de redes neurais, as funções de ativação são essenciais. Uma de suas principais funções é permitir o aprendizado de regiões e superfícies de decisão mais complexas. Nesse …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Dentro do contexto de redes neurais, as funções de ativação são essenciais. Uma de suas principais funções é permitir o aprendizado de regiões e superfícies de decisão mais complexas. Nesse post, iremos criar redes neurais usando &lt;code&gt;Pytorch&lt;/code&gt; e analisar as superfícies de decisão com e sem funções de ativação.&lt;/p&gt;
+&lt;h2&gt;Redes neurais&lt;/h2&gt;
+&lt;p&gt;Uma rede neural é um aproximador universal de funções. O que isso quer dizer? Basicamente, uma rede neural consegue aproximar qualquer função contínua (&lt;a href="http://neuralnetworksanddeeplearning.com/chap4.html"&gt;dadas algumas condições&lt;/a&gt;). Quando estamos tratando de aprendizado de máquina, de modo geral, a ideia é essencialmente aproximar uma função que descreve/aprende seus dados de treino. &lt;/p&gt;
+&lt;p&gt;Dessa forma, redes neurais são ferramentas muito poderosas em problemas de classificação, em que procuramos uma superfície de decisão para conseguir dizer a qual classe um objeto pertence, e regressão, em que predizemos um valor numérico. Nesse post, iremos abordar o uso das redes em problemas de classificação.&lt;/p&gt;
+&lt;p&gt;Algumas peças importantes compõem a arquitetura de uma rede neural, e os componentes básicos são: os neurônios (unidades básicas), a entrada (&lt;em&gt;inputs&lt;/em&gt;), as camadas internas (&lt;em&gt;hidden layers&lt;/em&gt;), as funções de ativação (&lt;em&gt;activation functions&lt;/em&gt;) e a camada de saída (&lt;em&gt;outputs&lt;/em&gt;). Na imagem abaixo, temos uma ilustração de uma rede:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="neuralnet" src="https://tutss.github.io/images/simple_nn.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Rede neural com uma camada de entrada, uma camada interna&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;e uma camada de saída. Fonte: &lt;a href="https://commons.wikimedia.org/wiki/File:Neuralnetwork.png"&gt;Wikipedia&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Não entraremos em detalhes sobre outros pontos igualmente relevantes no estudo de redes neurais, como funções de perda (&lt;em&gt;loss functions&lt;/em&gt;), otimizadores (&lt;em&gt;optimizers&lt;/em&gt;), &lt;em&gt;backpropagation&lt;/em&gt;, etc. Em especial, iremos analisar o impacto das funções de ativação quando temos um problema de classificação com uma superfície não linear.&lt;/p&gt;
+&lt;h3&gt;Exemplo em Pytorch&lt;/h3&gt;
+&lt;p&gt;Um neurônio, unidade fundamental de uma rede neural, computa uma função linear do que recebe de entrada:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+y = w*x + b
+$$&lt;/div&gt;
+&lt;p&gt;Como podemos perceber, essa equação define uma reta. Em &lt;code&gt;Pytorch&lt;/code&gt;, podemos descrever essa função como:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/eea6c62bd60a5d146613b982e51ab50d.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+import torch.nn as nn
+model = nn.Linear(1,1)
+y = model(x)
+``` --&gt;
+
+&lt;p&gt;Se os neurônios definem retas, como uma rede pode aproximar tão bem funções complexas? Afinal, combinações de funções lineares são lineares. É ai que entra a importância das funções de ativação.&lt;/p&gt;
+&lt;h2&gt;Funções de ativação&lt;/h2&gt;
+&lt;p&gt;Como comentado anteriormente, um dos principais papéis das funções de ativação é adicionar não linearidade na saída de um neurônio, permitindo que a rede consiga aprender superfícies de decisão mais complexas. Existem diferentes tipos de funções de ativação, veja na figura abaixo:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="activationfunc" src="https://tutss.github.io/images/activ_func.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Exemplo de duas funções de ativação: ReLU e &lt;em&gt;Softplus&lt;/em&gt;. Fonte: &lt;a href="https://commons.wikimedia.org/wiki/File:Rectified_linear_and_Softplus_activation_functions.png"&gt;Wikipedia&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Um exemplo comum de função de ativação é a função sigmóide, descrita matematicamente como:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+f(x) = \frac{1}{1+e^{-x}}
+$$&lt;/div&gt;
+&lt;p&gt;
+A função sigmóide é não linear e o seu resultado são valores no intervalo entre 0 e 1. Ela, como as demais funções de ativação, introduzem o fator não linearidade na rede quando um neurônio computa:
+&lt;/p&gt;
+&lt;div class="math"&gt;$$
+f(y) = f(w*x + b) = \frac{1}{1+e^{-(wx+b)}}
+$$&lt;/div&gt;
+&lt;p&gt;No nosso caso, o problema de classificação em questão é obtido pela função &lt;code&gt;make_moons&lt;/code&gt; do pacote &lt;code&gt;scikit-learn&lt;/code&gt;. Nele, temos duas features que descrevem duas classes, como na figura abaixo.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="makemoons" src="https://tutss.github.io/images/makemoons.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Dataset &lt;em&gt;make_moons&lt;/em&gt;.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Iremos inicialmente montar uma pequena rede, sem nenhuma função de ativação, e verificar a superfície de decisão que ela obtêm.&lt;/p&gt;
+&lt;h2&gt;Avaliando as redes no conjunto &lt;em&gt;make_moons&lt;/em&gt;&lt;/h2&gt;
+&lt;p&gt;O pacote &lt;a href="pytorch.org/"&gt;Pytorch&lt;/a&gt; possui alguns módulos que auxiliam e simplificam a construção de uma rede neural. No nosso caso, iremos utilizar o módulo &lt;code&gt;nn&lt;/code&gt;, que contém métodos e classes necessárias para a construção da rede, e o módulo &lt;code&gt;optim&lt;/code&gt;, que contém os otimizadores para as redes.&lt;/p&gt;
+&lt;p&gt;Primeiro, é importante lembrar que o Pytorch trabalha com uma estrutura de dados chamada &lt;strong&gt;tensor&lt;/strong&gt;. Um tensor seria uma generalização de um vetor em &lt;span class="math"&gt;\(N\)&lt;/span&gt; dimensões. Por exemplo, um vetor é um tensor com 1 dimensão e uma matriz é um tensor com 2 dimensões. O pacote &lt;code&gt;scikit-learn&lt;/code&gt;, que contém a função para construirmos o conjunto de dados, utiliza vetores do &lt;code&gt;numpy&lt;/code&gt;, e portanto, precisamos convertê-los para a estrutura &lt;code&gt;torch.tensor&lt;/code&gt;.&lt;/p&gt;
+&lt;h3&gt;Convertendo para tensor&lt;/h3&gt;
+&lt;p&gt;Obtemos o conjunto de dados:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/45d7acb84bac1dde4b7fa7e5ed4321b4.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+n_samples = 1_000
+X, y = make_moons(n_samples=n_samples, noise=0.1, random_state=42)
+``` --&gt;
+
+&lt;p&gt;Dividimos o conjunto em treino e teste:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/0c8299a296ac50a84b6d564921066e39.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.25, random_state=42)
+``` --&gt;
+
+&lt;p&gt;Convertendo para tensor:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/b4fbff0722d824d422bfdb9516883c2d.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+X_train_tensor = torch.from_numpy(X_train)
+y_train_tensor = torch.from_numpy(y_train).unsqueeze(1)
+
+&lt;!-- X_val_tensor = torch.from_numpy(X_val)
+y_val_tensor = torch.from_numpy(y_val).unsqueeze(1)
+``` --&gt;
+
+&lt;h3&gt;Módulos &lt;code&gt;nn&lt;/code&gt; e &lt;code&gt;optim&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;O módulo &lt;code&gt;nn&lt;/code&gt; contém componentes importantes na construção de uma rede, como o tipo das camadas, as funções de perda e ativação que iremos utilizar. Já o módulo &lt;code&gt;optim&lt;/code&gt; contém os otimizadores para a rede.&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/3be84f7f761d67ec251d8465c86a4b46.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+import torch.nn as nn
+import torch.optim as optim
+``` --&gt;
+
+&lt;hr&gt;
+&lt;h2&gt;Construindo as redes&lt;/h2&gt;
+&lt;p&gt;Agora temos as peças necessárias para construir as redes que irão classificar o nosso conjunto. Assim como no pacote Keras, o Pytorch possui um módulo chamado &lt;a href="https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html"&gt;&lt;code&gt;nn.Sequential&lt;/code&gt;&lt;/a&gt; que facilita bastante a construção da rede. Também, precisamos de um otimizador, no nosso caso, &lt;a href="https://pytorch.org/docs/stable/_modules/torch/optim/adagrad.html#Adagrad"&gt;&lt;code&gt;Adagrad&lt;/code&gt;&lt;/a&gt; e a função de perda &lt;a href="https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#torch.nn.BCELoss"&gt;&lt;code&gt;nn.BCELoss&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Aqui vale ressaltar que a escolha do otimizador e da função de perda não tiveram uma grande motivação, apenas que o &lt;code&gt;Adagrad&lt;/code&gt; é um otimizador comum, e a função de perda é apropriada para classificação binária (&lt;a href="https://en.wikipedia.org/wiki/Cross_entropy"&gt;&lt;em&gt;binary cross entropy&lt;/em&gt;&lt;/a&gt;).&lt;/p&gt;
+&lt;h3&gt;1° modelo&lt;/h3&gt;
+&lt;p&gt;Para o primeiro modelo, com 100 unidades em uma única camada interna, temos:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/744c13a2092b093b7b7dd948abcb16b4.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+model = nn.Sequential(
+    nn.Linear(input_shape, 100),
+    nn.Linear(100, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(model.parameters())
+loss = nn.BCELoss()
+``` --&gt;
+
+&lt;p&gt;Com a rede construída, precisamos treiná-la para que possa aprender as características dos dados e realizar as previsões. A função de treino:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/6e55bb5f4ea271db57dc36da338aa262.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+def train(model, loss, optimizer, train_values, train_target, val_values, val_target, epochs=50):
+    for e in range(1, epochs+1):
+        optimizer.zero_grad()   
+        output = model(train_values.float())
+        loss_train = loss(output, train_target.float())
+
+&lt;!-- val_output = model(val_values.float())
+        loss_val = loss(val_output, val_target.float())
+
+        loss_train.backward()
+        optimizer.step()
+        if e == 1 or e % 10 == 0:
+            print(f'Epoch {e}: \ttrain loss {loss_train.item():.2f}\t validation loss {loss_val.item():.2f}')
+``` --&gt;
+
+&lt;p&gt;E o loop de treino:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/2d70a406f2b65c99044df099a92817c1.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+train(model, loss, optimizer, X_train_tensor, y_train_tensor, X_val_tensor, y_val_tensor, epochs=150)
+``` --&gt;
+
+&lt;h4&gt;Resultados para o 1° modelo&lt;/h4&gt;
+&lt;p&gt;Podemos notar que o 1° modelo não contém uma função de ativação, e portanto, tem problemas em conseguir caracterizar funções mais complexas (não lineares). Um exercício interessante para analisar esse caso, é verificar a superfície de decisão:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="model1pred" src="https://tutss.github.io/images/model1_pred.png"&gt;&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th align="center"&gt;&lt;img alt="model1bound" src="https://tutss.github.io/images/model1_bound.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Predições feitas pelo 1° modelo&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align="center"&gt;Superfície de decisão do 1° modelo&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Podemos tentar expandir essa rede (ainda sem funções de ativação) para verificar o impacto do aumento de camadas:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/f50499daa9dbf400fba31b1fa8c23943.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+model = nn.Sequential(
+    nn.Linear(input_shape, 128),
+    nn.Linear(128, 64),
+    nn.Linear(64, 32),
+    nn.Linear(32, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(model.parameters())
+loss = nn.BCELoss()
+``` --&gt;
+
+&lt;p&gt;Obtemos os seguintes resultados:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="model11pred" src="https://tutss.github.io/images/model11_pred.png"&gt;&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th align="center"&gt;&lt;img alt="model11bound" src="https://tutss.github.io/images/model11_bound.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Predições feitas pelo 1° modelo com um maior número de camadas.&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align="center"&gt;Superfície de decisão do 1° modelo com um maior número de camadas.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Analisando as imagens acima, fica evidente que o melhor que a rede consegue é uma reta que separa, mesmo que não perfeitamente, as duas classes (vermelha e azul), coincidindo com o que esperávamos. Pelo fato de estarmos utilizando combinações lineares, padrões não lineares são quase imperceptíveis. &lt;/p&gt;
+&lt;h3&gt;2° modelo&lt;/h3&gt;
+&lt;p&gt;Agora, iremos introduzir uma função de ativação no modelo, e analisar o resultado obtido. A função de ativação que iremos selecionar é a função ReLU (&lt;a href="https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html#torch.nn.ReLU"&gt;&lt;code&gt;nn.ReLU&lt;/code&gt;&lt;/a&gt;), que matematicamente é expressa como: &lt;/p&gt;
+&lt;div class="math"&gt;$$
+f(x) = max(x, 0)
+$$&lt;/div&gt;
+&lt;p&gt;A função ReLU, por definição, é não linear (pela aplicação do máximo), e é comumente utilizada no contexto de redes neurais. Introduzindo a função de ativação, a rede terá maior capacidade de captar comportamentos não lineares nos dados.&lt;/p&gt;
+&lt;p&gt;Assim, o modelo fica:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/5f947c271a90144963f4d9aefdbcb476.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+non_linear_model = nn.Sequential(
+    nn.Linear(input_shape, 128),
+    nn.ReLU(),
+    nn.Linear(128, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(non_linear_model.parameters())
+loss = nn.BCELoss()
+``` --&gt;
+
+&lt;p&gt;Treinando o modelo como na etapa anterior, temos a seguinte superfície de decisão:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="relu1pred" src="https://tutss.github.io/images/relu1.png"&gt;&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th align="center"&gt;&lt;img alt="relu1bound" src="https://tutss.github.io/images/relu1_bound.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Predições feitas pelo 2° modelo.&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align="center"&gt;Superfície de decisão do 2° modelo.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Podemos perceber que agora, temos uma superfície mais curvilínea, devido a introdução de não linearidade pela camada &lt;code&gt;nn.ReLU&lt;/code&gt;. O resultado seria semelhante caso utilizássemos outra função de ativação (não necessariamente ser igual).&lt;/p&gt;
+&lt;h3&gt;Construindo mais modelos&lt;/h3&gt;
+&lt;p&gt;Para avaliar como as funções de ativação, atreladas a um maior número de camadas, permitem aproximarmos funções não lineares, iremos construir mais alguns modelos:&lt;/p&gt;
+&lt;script src="https://gist.github.com/tutss/7caf231958a5ac53c07c2063e58cc0d8.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+non_linear_model = nn.Sequential(
+    nn.Linear(input_shape, 128),
+    nn.ReLU(),
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(non_linear_model.parameters())
+loss = nn.BCELoss()
+``` --&gt;
+
+&lt;script src="https://gist.github.com/tutss/a431a5e01f467632d79e2502927c22bd.js"&gt;&lt;/script&gt;
+
+&lt;!-- ```python
+non_linear_model = nn.Sequential(
+    nn.Linear(input_shape, 256),
+    nn.ReLU(),
+    nn.Linear(256, 128),
+    nn.ReLU(),
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(non_linear_model.parameters())
+loss = nn.BCELoss()
+``` --&gt;
+
+&lt;p&gt;Analisando a evolução da superfície de decisão:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="relu2bound" src="https://tutss.github.io/images/relu2_bound.png"&gt;&lt;/th&gt;
+&lt;th&gt;&lt;/th&gt;
+&lt;th align="center"&gt;&lt;img alt="relu3bound" src="https://tutss.github.io/images/relu3_bound.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Predições feitas pelo 3° modelo.&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td align="center"&gt;Superfície de decisão do 4° modelo.&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Fica evidente que construindo uma rede com mais camadas, atreladas a funções de ativação (não lineares), a nossa superfície de decisão consegue captar mais nuances presentes nos dados, permitindo uma classificação mais acurada. Claro, a ideia aqui é avaliar a superfície em si, já que em um contexto de uma aplicação real seria necessário avaliar também a questão da generalização da rede, que seria o quão bem a rede consegue classificar dados os quais nunca viu.&lt;/p&gt;
+&lt;p&gt;Verificamos que introduzindo as funções de ativação, junto ao aumento do número de camadas, nossa rede conseguiu captar as nuances da distribuição não linear dos dados.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Nesse post, conseguimos analisar brevemente um dos principais impactos de funções de ativação dentro do contexto de redes neurais. O tópico é uma grande área de pesquisa, com constantes novas descobertas, e apenas pincelamos o seu uso dentro do cenário de classificação.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;O post também é acompanhado de um notebook, &lt;a href="https://github.com/tutss/datascience/blob/master/nonlinearity.ipynb"&gt;neste link&lt;/a&gt;.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As referências para a construção desse material foram:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="https://pytorch.org/assets/deep-learning/Deep-Learning-with-PyTorch.pdf"&gt;Deep Learning with Pytorch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://www.machinecurve.com/index.php/2020/10/29/why-nonlinear-activation-functions-improve-ml-performance-with-tensorflow-example/"&gt;Why nonlinear activation functions improve ML performance&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="https://stackoverflow.com/questions/28256058/plotting-decision-boundary-of-logistic-regression?noredirect=1&amp;amp;lq=1"&gt;Plotting decision boundary of logistic regression&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Até o próximo post :)&lt;/p&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Blog"></category><category term="machine learning"></category><category term="data science"></category><category term="neural networks"></category><category term="pytorch"></category></entry><entry><title>Comparação entre buscas sobre eleições norte-americanas vs eleições municipais</title><link href="https://tutss.github.io/posts/2020/Nov/09/comparacao-entre-buscas-sobre-eleicoes-norte-americanas-vs-eleicoes-municipais" rel="alternate"></link><published>2020-11-09T13:30:00-03:00</published><updated>2020-11-09T13:30:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2020-11-09:/posts/2020/Nov/09/comparacao-entre-buscas-sobre-eleicoes-norte-americanas-vs-eleicoes-municipais</id><summary type="html">&lt;p&gt;Na semana passada, ouvi algumas notícias sobre a comparação entre a atenção dada as eleições nos EUA vs eleições municipais, que acontecem no próximo fim de semana, e como a …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Na semana passada, ouvi algumas notícias sobre a comparação entre a atenção dada as eleições nos EUA vs eleições municipais, que acontecem no próximo fim de semana, e como a eleição americana tem se destacado como foco.&lt;/p&gt;
+&lt;p&gt;Resolvi comparar, utilizando o Google Trends, os termos de pesquisa relativos a esses dois acontecimentos. A cor azul representa pesquisas para o termo "eleições americanas" e as demais eleições municipais (em verde, termo "eleições vereadores", em amarelo, "eleições prefeitura", em vermelho, "eleições municipais").&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="Termos" src="https://tutss.github.io/images/termos_trends.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Termos de pesquisa utilizados no Google Trends&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2&gt;Série dos últimos 30 dias&lt;/h2&gt;
+&lt;p&gt;Podemos analisar a série histórica dos últimos 30 dias, e comparar o interesse ao longo do tempo entre esses termos de pesquisa. Abaixo, o gráfico nos mostra uma disparada das pesquisas sobre as eleições norte-americanas, principalmente a partir do dia 31 de outubro.&lt;/p&gt;
+&lt;script type="text/javascript" src="https://ssl.gstatic.com/trends_nrtr/2402_RC03/embed_loader.js"&gt;&lt;/script&gt;
+
+&lt;script type="text/javascript"&gt;
+trends.embed.renderExploreWidget("TIMESERIES", {"comparisonItem":[{"keyword":"eleições eua","geo":"BR","time":"2020-10-19 2020-11-19"},{"keyword":"eleições municipais","geo":"BR","time":"2020-10-19 2020-11-19"},{"keyword":"eleições prefeitura","geo":"BR","time":"2020-10-19 2020-11-19"},{"keyword":"eleições vereadores","geo":"BR","time":"2020-10-19 2020-11-19"}],"category":0,"property":""}, {"exploreQuery":"date=today%201-m&amp;geo=BR&amp;q=elei%C3%A7%C3%B5es%20eua,elei%C3%A7%C3%B5es%20municipais,elei%C3%A7%C3%B5es%20prefeitura,elei%C3%A7%C3%B5es%20vereadores","guestPath":"https://trends.google.com.br:443/trends/embed/"});
+&lt;/script&gt;
+
+&lt;p&gt;Observamos que as pesquisas norte-americanas se destacam em comparação aos 3 termos de pesquisa relativos as eleições municipais. Entretanto, vale ressaltar que como os termos muitas vezes não contém toda a informação para que de fato a comparação seja válida, já que uma pesquisa com termos diferentes, nesse caso, não aparece, temos que nos atentar as conclusões tiradas desta comparação. De qualquer forma, ela dá um indicativo de que as eleições norte-americanas chamaram mais a atenção do que os demais termos por uma proporção alta.&lt;/p&gt;
+&lt;h2&gt;Mapa por estado&lt;/h2&gt;
+&lt;p&gt;Um outro gráfico de interesse seria o da quantidade de pesquisas segmentado por estado:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="Gráfico 2" src="https://tutss.github.io/images/grafico_trends_2.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Comparativo por estado dos termos de pesquisa. À direita, os 5 estados com maiores proporções de busca por pelo termo "eleições municipais".&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;O único estado onde a busca por algum termo relativo a eleições municipais se equiparou ao das eleições norte-americanas foi o estado do Acre, empatado em 40%, para o termo "eleições prefeitura". Para o mapa interativo, &lt;a href="https://trends.google.com.br/trends/explore/GEO_MAP?date=today%201-m&amp;amp;geo=BR&amp;amp;q=elei%C3%A7%C3%B5es%20eua,elei%C3%A7%C3%B5es%20municipais,elei%C3%A7%C3%B5es%20prefeitura,elei%C3%A7%C3%B5es%20vereadores&amp;amp;hl=pt-BR&amp;amp;sni=4"&gt;acesse aqui&lt;/a&gt;. Para o estado do Amapá, as buscas por eleições norte-americanas dominam no cenário de comparação aos 3 termos relativos a eleições municipais.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;O Google Trends é uma ferramenta interessante para analisarmos, mesmo que não tão profundamente, o comportamento das buscas, possibilitando a comparação por termos. Os gráficos e mapas nos permitem avaliar, que dentre os 4 termos apresentados, o termo relativo a eleições norte-americanas supera com uma grande margem os termos relativos a eleições municipais.&lt;/p&gt;
+&lt;p&gt;Até o próximo post!&lt;/p&gt;</content><category term="Blog"></category><category term="eleicoes"></category><category term="data science"></category><category term="google trends"></category></entry><entry><title>Entrevista com o Apoio BCC</title><link href="https://tutss.github.io/posts/2020/Oct/06/entrevista-com-o-apoio-bcc" rel="alternate"></link><published>2020-10-06T15:30:00-03:00</published><updated>2020-10-06T15:30:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2020-10-06:/posts/2020/Oct/06/entrevista-com-o-apoio-bcc</id><summary type="html">&lt;p&gt;No mês de maio, tive a oportunidade de conversar com o &lt;strong&gt;Felipe Noronha&lt;/strong&gt; e a &lt;strong&gt;Ísis Logullo&lt;/strong&gt;, sobre minha experiência no Bacharelado em Ciência da Computação, o BCC. Foi uma …&lt;/p&gt;</summary><content type="html">&lt;p&gt;No mês de maio, tive a oportunidade de conversar com o &lt;strong&gt;Felipe Noronha&lt;/strong&gt; e a &lt;strong&gt;Ísis Logullo&lt;/strong&gt;, sobre minha experiência no Bacharelado em Ciência da Computação, o BCC. Foi uma conversa super legal, contando um pouco da minha trajetória como Representante de classe e Representante Discente.&lt;/p&gt;
+&lt;p&gt;Fica o convite para assistirem o vídeo, e se inscreverem no canal do BCC IME USP, para acompanhar o trabalho incrível que o pessoal do Apoio BCC vêm fazendo, na divulgação do curso e dos grupos de extensão.&lt;/p&gt;
+&lt;h2&gt;Entrevista&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=Q57tTYit8Mo"&gt;&lt;img alt="Entrevista" src="https://img.youtube.com/vi/Q57tTYit8Mo/0.jpg"&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;Canal do BCC IME USP&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;a href="https://www.youtube.com/c/BCCIMEUSPa/"&gt;&lt;img alt="Canal BCC IME USP" src="https://tutss.github.io/images/canal_bcc.png"&gt;&lt;/a&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;</content><category term="Blog"></category><category term="entrevista"></category><category term="bcc"></category><category term="computação"></category></entry><entry><title>Tutorial de K-Means</title><link href="https://tutss.github.io/posts/2020/Sep/11/tutorial-de-k-means" rel="alternate"></link><published>2020-09-11T18:30:00-03:00</published><updated>2020-09-11T18:30:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2020-09-11:/posts/2020/Sep/11/tutorial-de-k-means</id><summary type="html">&lt;h3&gt;Publiquei um novo notebook no Kaggle explicando (e aprendendo) sobre algoritmos de clustering, especialmente o K-Means.&lt;/h3&gt;
+&lt;p&gt;Ao longo do notebook, são abordados:&lt;/p&gt;
+&lt;h4&gt;1. O que é K-Means, para que serve …&lt;/h4&gt;</summary><content type="html">&lt;h3&gt;Publiquei um novo notebook no Kaggle explicando (e aprendendo) sobre algoritmos de clustering, especialmente o K-Means.&lt;/h3&gt;
+&lt;p&gt;Ao longo do notebook, são abordados:&lt;/p&gt;
+&lt;h4&gt;1. O que é K-Means, para que serve e como podemos utilizá-lo.&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Como funciona e o que é.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;2. Problemas relacionados e métricas de comparação.&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Como avaliar um modelo no cenário não supervisionado?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;3. Spectral Clustering&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Comparar o K-Means com outro algoritmo de clustering.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4&gt;4. K-Means aplicado ao &lt;em&gt;load_digits()&lt;/em&gt; (subconjunto do MNIST)&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Aplicar o K-Means no reconhecimento de dígitos e comparar com outros algoritmos de clustering&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;A ideia central do algoritmo K-Means é &lt;strong&gt;clusterização&lt;/strong&gt;, ou seja, dado um dataset, conseguir &lt;strong&gt;separar os dados em clusters&lt;/strong&gt;, de forma a diferenciá-los com labels diferentes. É um algoritmo não supervisionado, pois não necessita de um valor real ou classificação par construir os clusters.&lt;/p&gt;
+&lt;p&gt;Por exemplo, para um conjunto de dados distribuído como:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="kmeans-1" src="https://tutss.github.io/images/kmeans_1.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Dataset obtidos da função &lt;em&gt;make_blobs()&lt;/em&gt;, da biblioteca &lt;em&gt;scikit-learn&lt;/em&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;E aplicando o K-Means, chegamos na seguinte configuração de &lt;em&gt;labels&lt;/em&gt;:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="kmeans-2" src="https://tutss.github.io/images/kmeans_2.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Dataset com os labels obtidos pelo K-Means&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;O algoritmo do K-Means é relativamente simples. Dado um número k de clusters inicial (veremos porque isso pode ser um problema) selecionados aleatoriamente, são calculados as distâncias de cada ponto aos k pontos (centros) escolhidos e o ponto recebe a label do cluster mais próximo, re-calculamos os centros com base na média do cluster, até que os clusters não mudem.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="kmeans-3" src="https://tutss.github.io/images/kmeans_3.png"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Aplicação do K-Means com k=3 e k=4, em um dataset obtido de uma distribuição normal multivariada&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;O notebook completo pode ser encontrado &lt;a href="https://www.kaggle.com/arturmrs/tutorial-k-means"&gt;aqui!&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;hr&gt;</content><category term="Blog"></category><category term="machine learning"></category><category term="data science"></category></entry><entry><title>Apresentação Lightning Hacks</title><link href="https://tutss.github.io/posts/2020/Apr/13/apresentacao-lightning-hacks" rel="alternate"></link><published>2020-04-13T19:35:00-03:00</published><updated>2020-04-13T19:35:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2020-04-13:/posts/2020/Apr/13/apresentacao-lightning-hacks</id><summary type="html">&lt;p&gt;Nesse último fim de semana (dia 11/4) participei do &lt;a href="https://lh.imesec.ime.usp.br/"&gt;Lightning Hacks&lt;/a&gt;, falando sobre GANs (Generative Adversarial Networks) e como elas podem ser utilizadas para criar arte!&lt;/p&gt;
+&lt;p&gt;A palestra é …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Nesse último fim de semana (dia 11/4) participei do &lt;a href="https://lh.imesec.ime.usp.br/"&gt;Lightning Hacks&lt;/a&gt;, falando sobre GANs (Generative Adversarial Networks) e como elas podem ser utilizadas para criar arte!&lt;/p&gt;
+&lt;p&gt;A palestra é curta (5 min, pelas regras do LH) e bem introdutória, mas de toda forma, foi super legal poder ter participado. Os slides da apresentação se encontram &lt;a href="https://tutss.github.io/slides/lh.pdf"&gt;aqui&lt;/a&gt;.&lt;/p&gt;
+&lt;h2&gt;Vídeo no Youtube:&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://www.youtube.com/watch?v=Hksu-zRh5_Q"&gt;&lt;img alt="Lightning Hacks" src="https://img.youtube.com/vi/Hksu-zRh5_Q/0.jpg"&gt;&lt;/a&gt;&lt;/p&gt;</content><category term="Blog"></category><category term="palestra"></category><category term="tecnologia"></category><category term="gan"></category><category term="lh"></category></entry><entry><title>Melhores podcasts de tecnologia</title><link href="https://tutss.github.io/posts/2020/Jan/10/melhores-podcasts-de-tecnologia" rel="alternate"></link><published>2020-01-10T15:47:00-03:00</published><updated>2020-01-10T15:47:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2020-01-10:/posts/2020/Jan/10/melhores-podcasts-de-tecnologia</id><summary type="html">&lt;p&gt;Uma mídia interessante para aprender e passar o tempo é o podcast. Um podcast se assemelha a ouvir uma música, você escolhe um produtor e 
+pode ouvir diferentes episódios. Geralmente …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Uma mídia interessante para aprender e passar o tempo é o podcast. Um podcast se assemelha a ouvir uma música, você escolhe um produtor e 
+pode ouvir diferentes episódios. Geralmente, existem aplicativos que unificam todas suas inscrições, e organizam sua biblioteca 
+de podcasts, como o &lt;a href="https://overcast.fm/"&gt;Overcast&lt;/a&gt; (o que eu uso), mas pelo Spotify também é possível acessar os mais diversos produtores.&lt;/p&gt;
+&lt;p&gt;Nos últimos anos, o número de podcasts tem crescido imensamente. De acordo com pesquisas elaboradas pela &lt;a href="https://www.edisonresearch.com/infinite-dial-2019/"&gt;Edison Research&lt;/a&gt;, 
+dentre a população maior de 12 anos nos EUA, o número de ouvintes já passou de 50%. Nos gráficos abaixo, é possível observar que a tendência é de alto crescimento.&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="infinite-dial-2019-chart-1" src="https://tutss.github.io/images/infinite-dial-podcast.jpg"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Crescimento de ouvintes de 2006 a 2019. Fonte: &lt;a href="https://www.edisonresearch.com/infinite-dial-2019/"&gt;Edison Research&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Abaixo, podemos ver estimativas de crescimento:&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th align="center"&gt;&lt;img alt="infinite-dial-2019-chart-2" src="https://tutss.github.io/images/infinite-dial-podcast-2.jpg"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td align="center"&gt;Estimativas em comparação a 2018. Fonte: &lt;a href="https://www.edisonresearch.com/infinite-dial-2019/"&gt;Edison Research&lt;/a&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;Em relação à tecnologia, existem diversos podcasts interessantes. Venho compartilhar a lista daqueles que vejo como os melhores,
+principalmente devido ao conteúdo, qualidade, e relevância dos temas abordados. Lembrando que não tenho a intenção de rankear
+cada um deles, então o 1° é tão bom quanto o último, nessa sequência. Todos eles são em inglês, então talvez isso seja uma dificuldade para
+quem não está tão confortável com o idioma :/&lt;/p&gt;
+&lt;hr&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;&lt;img alt="unsplash" src="https://tutss.github.io/images/juja-han-uT55XxQLQGU-unsplash.jpg"&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Photo by &lt;a href="https://unsplash.com/@juja_han"&gt;Juja Han&lt;/a&gt; on Unsplash&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3&gt;&lt;a href="https://www.dataskeptic.com/"&gt;Data Skeptic&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Aborda temas relacionados a ciência de dados, &lt;em&gt;machine learning&lt;/em&gt; e estatística. É interessante tanto para iniciantes, quanto para intermediários e avançados, e tem um nível de profundidade que é possível realmente aprender conceitos diferentes. Alguns episódios são menos teóricos, e você consegue absorver a ideia central com mais facilidade, já outros abordam um pouco mais o funcionamento, de por exemplo, um algoritmo de aprendizado. Em geral, os métodos abordados são atuais e com diversas aplicações já existentes no mercado. Na minha opinião, os episódios tem a duração ideal, entre 20 e 50 minutos, então você consegue ouvir indo para o trabalho ou faculdade.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://twimlai.com/"&gt;TWIML AI (This Week In Machine Learning and Artificial Intelligence)&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Na minha opinião, um dos melhores podcasts sobre IA. Além de apresentar e trazer convidados relevantes da indústria, você aprende diferentes abordagens e inovações da área. Mesmo com episódios mais longos, não é cansativo de ouvir, pois as perguntas nos bate papos são sempre interessantes. Temas como &lt;em&gt;deep learning&lt;/em&gt;, &lt;em&gt;reinforcement learning&lt;/em&gt;, ética em computação, e tudo relacionado aos novos desenvolvimentos do campo surgem nos episódios, assim como suas aplicações. A diferença que vejo em relação aos demais é o nível de profundidade e maturidade do podcast, sendo bem completo e interessante. Ele é regularmente atualizado e traz destaques da indústria para conversar.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://www.oreilly.com/topics/oreilly-data-show-podcast"&gt;O'Reilly Data Show Podcast&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Você provavelmente já viu os livros da O'Reilly por aí (ou algum &lt;a href="https://i.pinimg.com/236x/7c/42/fc/7c42fc2db0ae0227405260fa3608a8b9--writing-code-python-programming.jpg"&gt;meme&lt;/a&gt;), principalmente de computação. Eles podem ser um pouco caros, mas felizmente existe o podcast da O'Reilly, que é ótimo (e mais acessível). Seguindo no contexto de ciência de dados, big data e IA, traz convidados da indústria para falarem sobre algum tópico que se debruçaram durante um desenvolvimento. Infelizmente, o podcast não é atualizado a algum tempo - último é de 10 de outubro de 2019 - mas mesmo assim existem muitos episódios disponíveis. Cada episódio tem por volta de 30 a 50 min, e acredito ser mais interessante para quem está iniciando na área, já que tem uma abordagem mais geral sobre os tópicos tratados.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://lineardigressions.com/"&gt;Linear Digressions&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Gosto bastante desse podcast por trazer temas mais relacionados a estatística - dentro do contexto de &lt;em&gt;machine learning&lt;/em&gt; - e que não aparecem muito nos outros. Na maioria dos episódios, um tópico é destrinchado, de forma intuitiva, para que você entenda como algum método/descoberta funciona. &lt;em&gt;Papers&lt;/em&gt; novos são discutidos, mas não chega a ser algo excessivamente teórico, e pelo fato dos episódios terem por volta de 20 a 30 min, não é cansativo. Às vezes você ouve barulhos de fundo no ambiente de gravação, mas nada que atrapalhe o entendimento. Vale super a pena tanto para quem se interessa pelo tema, quanto para quem tem anos de experiência na área.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://www.ft.com/tech-tonic-podcast"&gt;FT Tech Tonic&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Podcast de tecnologia da Financial Times, e por consequência, é menos técnico. Trata os temas de forma mais ampla, principalmente aqueles com impacto no mercado e relacionados a inovação. Ética, segurança, &lt;em&gt;venture capital&lt;/em&gt;, relações de trabalho e inovações são os principais. É interessante para quem não é da computação, mas quer se informar sobre novidades e discussões recentes. Gestores e líderes de diferentes áreas que possuem contato com tecnologia falam, a cada episódio, sobre um tema específico, como o impacto de IA no trabalho, investimentos em &lt;em&gt;fintechs&lt;/em&gt;, ética, capitalismo de vigilância, impactos da robótica, entre muitos outros. Cada episódio tem por volta de 30 min. Pelo fato dos temas serem bem amplos e diferentes, você facilmente ouve 2 ou 3 episódios na sequência.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://www.dataengineeringpodcast.com/"&gt;Data Engineering Podcast&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Podcast mais técnico, voltado a engenharia de software e de dados. Os convidados são muito bons, e trazem suas experiências no desenvolvimento de algum produto ou ideia. Acredito que ele seja mais voltado para quem está mais confortável com assuntos mais técnicos, e.g. bancos de dados, &lt;em&gt;warehouses&lt;/em&gt;, &lt;em&gt;streaming&lt;/em&gt;, etc, mas não possui uma barreira que impeça pessoas de fora da área de entenderem o assunto. Por ser mais técnico, é um dos mais legais para quem trabalha na área, e me ajudou ao longo do meu último estágio. Vários episódios trazem conversas com &lt;em&gt;experts&lt;/em&gt; de ferramentas comuns, como Spark, Kafka, AWS, entre outras, portanto você consegue expandir seu conhecimento sobre o funcionamento de cada uma delas, e eventualmente descobrir novas formas de solucionar um problema. Também, é comum que representantes de empresas contem suas histórias no desenvolvimento de alguma ferramenta, relatando suas experiências e dificuldades, transmitindo conhecimentos relevantes sobre os desafios que tiveram. Os episódios tem entre 40 min a 1h10.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://lexfridman.com/ai/"&gt;Artificial Intelligence with Lex Friedman&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Para quem se interessa mais um pouco sobre pesquisa, filosofia e do lado mais humano de IA, esse podcast é sensacional. O produtor, Lex Friedman,
+traz convidados renomados, como Donald Knuth, Elon Musk, Bjarne Stroustrup, Peter Norvig, Yann LeCun, Ian Goodfellow, e Guido van Rossum. Minha sensação ouvindo o podcast é que ele tende para um lado mais questionador, no sentido de se interessar pelo indivíduo que promoveu alguma inovação, buscando saber suas opiniões sobre questões mais filosóficas, principalmente em relação a inteligência artificial - claro, é o nome do podcast. Os episódios variam no tempo, sendo alguns de 30 min, outros de 1h20, mas com certeza as reflexões propostas agregam bastante.&lt;/p&gt;
+&lt;h3&gt;&lt;a href="https://softwareengineeringdaily.com/"&gt;Software Engineering Daily&lt;/a&gt;&lt;/h3&gt;
+&lt;p&gt;Assim como o Data Engineering Podcast, tem um teor mais técnico, e foco em profissionais da área. Trata de todo o mundo de engenharia de software, trazendo sempre um convidado do tópico em específico. É realmente bem amplo, com episódios sobre o funcionamento dos times de engenharia do Facebook, implementação de sistemas de dados na Uber, uso do Kafka no LinkedIn, outros tratam sobre usos de ferramentas como EC2, Cassandra, Kubernetes, entre outros. Vale muito a pena ouvir, pois você aprende bastante com as experiências compartilhadas.&lt;/p&gt;
+&lt;hr&gt;</content><category term="Blog"></category><category term="podcast"></category><category term="tecnologia"></category><category term="big data"></category><category term="data science"></category></entry><entry><title>Experiência trabalhando em uma startup de alto crescimento</title><link href="https://tutss.github.io/posts/2019/Dec/19/experiencia-trabalhando-em-uma-startup-de-alto-crescimento" rel="alternate"></link><published>2019-12-19T11:50:00-03:00</published><updated>2019-12-19T11:50:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2019-12-19:/posts/2019/Dec/19/experiencia-trabalhando-em-uma-startup-de-alto-crescimento</id><summary type="html">&lt;p&gt;Me chamo Artur, sou aluno de Ciência da Computação no IME (Instituto de Matemática e Estatística) da Universidade de São Paulo. Neste semestre, &lt;strong&gt;tive a oportunidade de trabalhar em uma …&lt;/strong&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;Me chamo Artur, sou aluno de Ciência da Computação no IME (Instituto de Matemática e Estatística) da Universidade de São Paulo. Neste semestre, &lt;strong&gt;tive a oportunidade de trabalhar em uma &lt;em&gt;startup&lt;/em&gt;&lt;/strong&gt;, e quis compartilhar essa experiência com vocês!&lt;/p&gt;
+&lt;p&gt;Ao longo desses meses, estive em contato com uma dinâmica diferente do que já havia experimentado, e pude aprender muito sobre o funcionamento de uma &lt;em&gt;startup&lt;/em&gt; de alto crescimento.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Alt Text" src="https://tutss.github.io/images/cobli_logo_horizontal.png"&gt;&lt;/p&gt;
+&lt;p&gt;A &lt;a href="https://www.cobli.co/"&gt;Cobli&lt;/a&gt; é uma &lt;em&gt;startup&lt;/em&gt; de IoT para logística e tem a grande missão de conectar carros de empresas na internet, dado a vasta frota existente no Brasil. Nela, oferecemos um arsenal de ferramentas para que o gestor de frota — desde o dono da mercearia à ambulâncias e grandes empresas — possa ter visibilidade e controle total sobre sua operação. Cada &lt;em&gt;feature&lt;/em&gt; é pensada para realmente auxiliar o gestor, e fazer com que seu dia a dia seja otimizado, provendo um sistema de alta tecnologia e fácil de usar.&lt;/p&gt;
+&lt;h2&gt;&lt;strong&gt;Crescimento acelerado&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Estive por um período de 6 meses, e nesse curto intervalo, participei de uma troca de escritório, &lt;a href="https://link.estadao.com.br/noticias/inovacao,startup-de-rastreamento-de-frotas-cobli-levanta-us-10-milhoes,70003052545"&gt;US$10 milhões na Series A&lt;/a&gt;, crescimento no número de funcionários, além de outros acontecimentos que demonstram a rapidez na qual as coisas acontecem. &lt;strong&gt;O dia a dia de trabalhar em uma &lt;em&gt;startup&lt;/em&gt; envolve você se deparar constantemente com mudanças e ver de fato o progresso acontecer.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;&lt;strong&gt;Cultura&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Algo que sempre ouvi falarem que era muito importante em uma empresa é a Cultura. &lt;strong&gt;A Cultura é a alma de uma &lt;em&gt;startup&lt;/em&gt;, é praticar, todos os dias, os pontos necessários para que tudo flua bem&lt;/strong&gt;. Ela define as interações entre os Coblers, principalmente no relacionamento pessoal. A Cultura na Cobli é um fator de excelência.&lt;/p&gt;
+&lt;p&gt;Desde o processo de onboarding, é ressaltado a importância da Cultura. &lt;strong&gt;Ser transparente é primordial.&lt;/strong&gt; Para que seu colega tome decisões boas, é necessário que você seja claro, relatando problemas, complicações e incômodos, e assim melhorar continuamente os processos e decisões. Além disso, &lt;strong&gt;pensar no cliente, com visão a longo prazo&lt;/strong&gt;, é profundamente enfatizado, afinal, o cliente é a prova final do produto. Os pontos que marcam a Cultura da Cobli são permeados em todos. A seriedade em efetivamente praticar atitudes que beneficiem a produtividade é visível nas interações intra e inter times.&lt;/p&gt;
+&lt;h2&gt;&lt;strong&gt;Minha experiência como estagiário&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Na Cobli, &lt;strong&gt;o estagiário tem o objetivo de aprender, complementando a formação&lt;/strong&gt;, aleḿ de ter apoio quanto a graduação, sendo possível ter horários flexíveis e pedir um tempo para estudos durante semana de provas. Esse ponto é um grande diferencial, já que em certos momentos a graduação pode pesar no cansaço.&lt;/p&gt;
+&lt;p&gt;Participei quase todo o estágio no time de Big Data (A.K.A. Prrruu). Como experiência profissional, essa foi minha primeira de maior duração. E mesmo com pouca experiência, desde o início já recebi atividades instigantes que demonstravam o quanto o time (e a Cobli) acreditavam no meu trabalho. &lt;strong&gt;Trabalhar em produção, com dados reais, impactando milhares de usuários foi uma constante.&lt;/strong&gt; Você na prática implementa código e vê aquilo funcionar, tomando decisões que podem ser críticas, o que é um grande aprendizado. É gratificante receber responsabilidades mesmo quando se está iniciando.&lt;/p&gt;
+&lt;p&gt;E claro, sempre que necessário, pedi e recebi diversos conselhos e dicas que me auxiliaram muito, e com certeza me fizeram aprender certas coisas que dificilmente veria durante a graduação — por exemplo, conceitos relacionados a processamento de dados em tempo real de forma distribuída (&lt;em&gt;streaming&lt;/em&gt;), ferramentas modernas de automação, serviços em cloud, etc. Estar próximo de pessoas brilhantes no que fazem ajuda demais, e o time de Big Data — assim como os demais — é excepcional.&lt;/p&gt;
+&lt;p&gt;Todas as frameworks que usei são interessantes, tanto do ponto de vista de serem novas, quanto de performance. &lt;strong&gt;O cerne do meu trabalho junto ao time foi o &lt;a href="https://ci.apache.org/projects/flink/flink-docs-release-1.9/"&gt;Apache Flink&lt;/a&gt;, utilizando Scala.&lt;/strong&gt; Nosso objetivo do semestre foi migrar os jobs, passando de uma antiga arquitetura baseada em Akka para o Flink.&lt;/p&gt;
+&lt;p&gt;O principal motivo foi a performance e todas as vantagens que o Flink oferece. Uma framework para processamento de dados distribuídos, super robusta e própria para lidar com dispositivos enviando dados 24/7, o Flink é robusto para um alto volume de dados, além de lidar com &lt;em&gt;backpressure&lt;/em&gt;, realizar &lt;em&gt;checkpoints&lt;/em&gt; dos estados constantemente, operar com diversos níveis de paralelismo, etc. Em suma, abre caminho para escalar a quantidade de dispositivos nas frotas. Para quem se interessar sobre, o Flink é baseado em um modelo descrito neste &lt;a href="https://www.vldb.org/pvldb/vol8/p1792-Akidau.pdf"&gt;paper&lt;/a&gt; ou &lt;a href="https://www.youtube.com/watch?v=3UfZN59Nsk8"&gt;vídeo&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Uma das principais linguagens de programação da Cobli é &lt;a href="https://www.scala-lang.org/"&gt;Scala&lt;/a&gt;. Scala é uma linguagem fantástica, e sua mescla entre programação funcional e programação orientada a objetos oferece uma flexibilidade que combina com o processamento do Flink, que possui também uma interface para Java.&lt;/p&gt;
+&lt;p&gt;Como nunca havia lidado com os problemas do contexto de &lt;em&gt;streaming&lt;/em&gt;, foi desafiante. A forma como o processamento é realizado, se a ordem dos dados importa, o que fazer caso a aplicação caia no meio do caminho, como lidar com estados anteriores, e se o volume de dados aumentar subitamente, foram alguns questionamentos que tive ao longo desse caminho, e pela prática que tive na Cobli, atrelado ao encorajamento do time para que me aprofundasse na teoria de processamento de dados, hoje já tenho experiência para lidar com esses problemas — claro, não todos rs.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Os aprendizados que conquistei com certeza foram muito devido aos meus ótimos colegas de trabalho, e fico feliz de poder ter aprendido tanto com eles.&lt;/strong&gt;&lt;/p&gt;
+&lt;h2&gt;&lt;strong&gt;Últimas semanas&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Nas minhas duas últimas semanas na Cobli, tive a oportunidade de conhecer um pouco mais sobre &lt;a href="https://pt.wikipedia.org/wiki/Site_Reliability_Engineering"&gt;SRE (Site Reliability Engineering)&lt;/a&gt;. O time de SRE (A.K.A. #nohammer) é responsável pela sustentação dos sistemas, produtividade dos desenvolvedores — desenvolvendo ferramentas -, assim como garante a confiabilidade (&lt;em&gt;reliability&lt;/em&gt;), o bom funcionamento e saúde da plataforma.&lt;/p&gt;
+&lt;p&gt;Tive a oportunidade de me aprofundar no uso da AWS — que já havia adquirido quando estava no Prrruu — , em especial &lt;a href="https://aws.amazon.com/pt/cloudformation/"&gt;AWS Cloudformation&lt;/a&gt;, criando &lt;em&gt;stack&lt;/em&gt;s para criação de infraestrutura em nuvem — &lt;a href="https://pt.wikipedia.org/wiki/Infraestrutura_como_C%C3%B3digo"&gt;&lt;em&gt;infra as code&lt;/em&gt;&lt;/a&gt;. Em poucas palavras, para não ser tão técnico, o que o Cloudformation te permite é que sua &lt;em&gt;stack&lt;/em&gt;, sua infra, esteja descrita em código, e possa ser criada, atualizada e destruída com um comando no terminal, fazendo com que o desenvolvimento e melhoramento seja mais simples, veloz e organizado.&lt;/p&gt;
+&lt;p&gt;Novamente, o time sempre disposto a auxiliar e incentivar com certeza engrandeceu toda minha experiência na Cobli.&lt;/p&gt;
+&lt;h2&gt;&lt;strong&gt;Fim de uma etapa&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Nesse semestre estagiando na Cobli, pude aprender muito, desde ferramentas, linguagens, técnicas, formas de implementação, boas práticas e muitas outras coisas. &lt;strong&gt;Mas acredito que um dos grandes aprendizados que vou levar é que uma empresa se faz de pessoas, se faz de como essas pessoas interagem e desenvolvem seu dia a dia.&lt;/strong&gt; Ter pessoas boas que de fato tem uma visão à longo prazo, engajadas e preocupadas em colaborar e apoiar, é o que faz da Cobli um lugar especial.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Meus agradecimentos a todos que estiveram comigo nesse período, em especial ao &lt;a href="https://br.linkedin.com/in/gustavovm"&gt;Gustavo Momenté (DG)&lt;/a&gt;, &lt;a href="https://br.linkedin.com/in/vinícius-pessoa-duarte-1a740794"&gt;Vinícius Duarte&lt;/a&gt; e &lt;a href="https://br.linkedin.com/in/nicolau-tahan-751338112"&gt;Nicolau Tahan&lt;/a&gt; por toda a paciência, dicas fundamentais, e pela amizade e parceria. &lt;/p&gt;
+&lt;p&gt;Também ao &lt;a href="https://br.linkedin.com/in/evandro-sanches-260537165"&gt;Evandro Sanches&lt;/a&gt; e &lt;a href="https://br.linkedin.com/in/ivan-stoiev"&gt;Ivan Stoiev&lt;/a&gt;, que puderam me transmitir tanto conhecimento em pouquíssimo tempo.&lt;/p&gt;
+&lt;p&gt;Também ao &lt;a href="https://br.linkedin.com/in/lucasbrunialti"&gt;Lucas Brunialti&lt;/a&gt;, pelas dicas e sugestões na construção do texto.&lt;/p&gt;</content><category term="Blog"></category><category term="startup"></category><category term="estágio"></category><category term="cobli"></category><category term="big data"></category></entry><entry><title>Primeiro post do blog!</title><link href="https://tutss.github.io/posts/2019/Dec/12/primeiro-post-do-blog" rel="alternate"></link><published>2019-12-12T23:50:00-03:00</published><updated>2019-12-12T23:50:00-03:00</updated><author><name>Artur Magalhães</name></author><id>tag:tutss.github.io,2019-12-12:/posts/2019/Dec/12/primeiro-post-do-blog</id><content type="html">&lt;p&gt;Primeiro post do blog. Feito com &lt;a href="http://getpelican.com/"&gt;Pelican&lt;/a&gt;, por sugestão do &lt;a href="https://github.com/lucasbrunialti/"&gt;@lucasbrunialti&lt;/a&gt;.&lt;/p&gt;</content><category term="Blog"></category><category term="hello world"></category><category term="pelican"></category></entry></feed>

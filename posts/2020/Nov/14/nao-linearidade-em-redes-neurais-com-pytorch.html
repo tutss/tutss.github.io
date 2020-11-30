@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Não linearidade em redes neurais com Pytorch</title>
+
+    <link rel="stylesheet" href="https://tutss.github.io/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://tutss.github.io/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://tutss.github.io/theme/css/style.css" />
+    <link rel="stylesheet" href="https://tutss.github.io/theme/css/pygments.css" />	
+    <script src="https://tutss.github.io/theme/js/modernizr.js"></script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://tutss.github.io">Tuts Blog</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+            <li><a href="https://tutss.github.io/pages/about-me" class="button secondary small">About me</a></li>
+            <li><a href="https://tutss.github.io/pages/resume" class="button secondary small">Resume</a></li>
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Main Blog Content -->
+    <div class="large-10 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://tutss.github.io/posts/2020/Nov/14/nao-linearidade-em-redes-neurais-com-pytorch" rel="bookmark"
+        title="Permalink to Não linearidade em redes neurais com Pytorch">Não linearidade em redes neurais com Pytorch</a></h3>
+    </header>
+
+<h6 class="subheader" title="2020-11-14T15:16:00-03:00">Sat 14 November 2020
+</h6>
+
+
+    <p>Dentro do contexto de redes neurais, as funções de ativação são essenciais. Uma de suas principais funções é permitir o aprendizado de regiões e superfícies de decisão mais complexas. Nesse post, iremos criar redes neurais usando <code>Pytorch</code> e analisar as superfícies de decisão com e sem funções de ativação.</p>
+<h2>Redes neurais</h2>
+<p>Uma rede neural é um aproximador universal de funções. O que isso quer dizer? Basicamente, uma rede neural consegue aproximar qualquer função contínua (<a href="http://neuralnetworksanddeeplearning.com/chap4.html">dadas algumas condições</a>). Quando estamos tratando de aprendizado de máquina, de modo geral, a ideia é essencialmente aproximar uma função que descreve/aprende seus dados de treino. </p>
+<p>Dessa forma, redes neurais são ferramentas muito poderosas em problemas de classificação, em que procuramos uma superfície de decisão para conseguir dizer a qual classe um objeto pertence, e regressão, em que predizemos um valor numérico. Nesse post, iremos abordar o uso das redes em problemas de classificação.</p>
+<p>Algumas peças importantes compõem a arquitetura de uma rede neural, e os componentes básicos são: os neurônios (unidades básicas), a entrada (<em>inputs</em>), as camadas internas (<em>hidden layers</em>), as funções de ativação (<em>activation functions</em>) e a camada de saída (<em>outputs</em>). Na imagem abaixo, temos uma ilustração de uma rede:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="neuralnet" src="https://tutss.github.io/images/simple_nn.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Rede neural com uma camada de entrada, uma camada interna</td>
+</tr>
+<tr>
+<td align="center">e uma camada de saída. Fonte: <a href="https://commons.wikimedia.org/wiki/File:Neuralnetwork.png">Wikipedia</a></td>
+</tr>
+</tbody>
+</table>
+<p>Não entraremos em detalhes sobre outros pontos igualmente relevantes no estudo de redes neurais, como funções de perda (<em>loss functions</em>), otimizadores (<em>optimizers</em>), <em>backpropagation</em>, etc. Em especial, iremos analisar o impacto das funções de ativação quando temos um problema de classificação com uma superfície não linear.</p>
+<h3>Exemplo em Pytorch</h3>
+<p>Um neurônio, unidade fundamental de uma rede neural, computa uma função linear do que recebe de entrada:
+</p>
+<div class="math">$$
+y = w*x + b
+$$</div>
+<p>Como podemos perceber, essa equação define uma reta. Em <code>Pytorch</code>, podemos descrever essa função como:</p>
+<script src="https://gist.github.com/tutss/eea6c62bd60a5d146613b982e51ab50d.js"></script>
+
+<!-- ```python
+import torch.nn as nn
+model = nn.Linear(1,1)
+y = model(x)
+``` -->
+
+<p>Se os neurônios definem retas, como uma rede pode aproximar tão bem funções complexas? Afinal, combinações de funções lineares são lineares. É ai que entra a importância das funções de ativação.</p>
+<h2>Funções de ativação</h2>
+<p>Como comentado anteriormente, um dos principais papéis das funções de ativação é adicionar não linearidade na saída de um neurônio, permitindo que a rede consiga aprender superfícies de decisão mais complexas. Existem diferentes tipos de funções de ativação, veja na figura abaixo:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="activationfunc" src="https://tutss.github.io/images/activ_func.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Exemplo de duas funções de ativação: ReLU e <em>Softplus</em>. Fonte: <a href="https://commons.wikimedia.org/wiki/File:Rectified_linear_and_Softplus_activation_functions.png">Wikipedia</a></td>
+</tr>
+</tbody>
+</table>
+<p>Um exemplo comum de função de ativação é a função sigmóide, descrita matematicamente como:
+</p>
+<div class="math">$$
+f(x) = \frac{1}{1+e^{-x}}
+$$</div>
+<p>
+A função sigmóide é não linear e o seu resultado são valores no intervalo entre 0 e 1. Ela, como as demais funções de ativação, introduzem o fator não linearidade na rede quando um neurônio computa:
+</p>
+<div class="math">$$
+f(y) = f(w*x + b) = \frac{1}{1+e^{-(wx+b)}}
+$$</div>
+<p>No nosso caso, o problema de classificação em questão é obtido pela função <code>make_moons</code> do pacote <code>scikit-learn</code>. Nele, temos duas features que descrevem duas classes, como na figura abaixo.</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="makemoons" src="https://tutss.github.io/images/makemoons.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Dataset <em>make_moons</em>.</td>
+</tr>
+</tbody>
+</table>
+<p>Iremos inicialmente montar uma pequena rede, sem nenhuma função de ativação, e verificar a superfície de decisão que ela obtêm.</p>
+<h2>Avaliando as redes no conjunto <em>make_moons</em></h2>
+<p>O pacote <a href="pytorch.org/">Pytorch</a> possui alguns módulos que auxiliam e simplificam a construção de uma rede neural. No nosso caso, iremos utilizar o módulo <code>nn</code>, que contém métodos e classes necessárias para a construção da rede, e o módulo <code>optim</code>, que contém os otimizadores para as redes.</p>
+<p>Primeiro, é importante lembrar que o Pytorch trabalha com uma estrutura de dados chamada <strong>tensor</strong>. Um tensor seria uma generalização de um vetor em <span class="math">\(N\)</span> dimensões. Por exemplo, um vetor é um tensor com 1 dimensão e uma matriz é um tensor com 2 dimensões. O pacote <code>scikit-learn</code>, que contém a função para construirmos o conjunto de dados, utiliza vetores do <code>numpy</code>, e portanto, precisamos convertê-los para a estrutura <code>torch.tensor</code>.</p>
+<h3>Convertendo para tensor</h3>
+<p>Obtemos o conjunto de dados:</p>
+<script src="https://gist.github.com/tutss/45d7acb84bac1dde4b7fa7e5ed4321b4.js"></script>
+
+<!-- ```python
+n_samples = 1_000
+X, y = make_moons(n_samples=n_samples, noise=0.1, random_state=42)
+``` -->
+
+<p>Dividimos o conjunto em treino e teste:</p>
+<script src="https://gist.github.com/tutss/0c8299a296ac50a84b6d564921066e39.js"></script>
+
+<!-- ```python
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.25, random_state=42)
+``` -->
+
+<p>Convertendo para tensor:</p>
+<script src="https://gist.github.com/tutss/b4fbff0722d824d422bfdb9516883c2d.js"></script>
+
+<!-- ```python
+X_train_tensor = torch.from_numpy(X_train)
+y_train_tensor = torch.from_numpy(y_train).unsqueeze(1)
+
+<!-- X_val_tensor = torch.from_numpy(X_val)
+y_val_tensor = torch.from_numpy(y_val).unsqueeze(1)
+``` -->
+
+<h3>Módulos <code>nn</code> e <code>optim</code></h3>
+<p>O módulo <code>nn</code> contém componentes importantes na construção de uma rede, como o tipo das camadas, as funções de perda e ativação que iremos utilizar. Já o módulo <code>optim</code> contém os otimizadores para a rede.</p>
+<script src="https://gist.github.com/tutss/3be84f7f761d67ec251d8465c86a4b46.js"></script>
+
+<!-- ```python
+import torch.nn as nn
+import torch.optim as optim
+``` -->
+
+<hr>
+<h2>Construindo as redes</h2>
+<p>Agora temos as peças necessárias para construir as redes que irão classificar o nosso conjunto. Assim como no pacote Keras, o Pytorch possui um módulo chamado <a href="https://pytorch.org/docs/stable/generated/torch.nn.Sequential.html"><code>nn.Sequential</code></a> que facilita bastante a construção da rede. Também, precisamos de um otimizador, no nosso caso, <a href="https://pytorch.org/docs/stable/_modules/torch/optim/adagrad.html#Adagrad"><code>Adagrad</code></a> e a função de perda <a href="https://pytorch.org/docs/stable/generated/torch.nn.BCELoss.html#torch.nn.BCELoss"><code>nn.BCELoss</code></a>.</p>
+<p>Aqui vale ressaltar que a escolha do otimizador e da função de perda não tiveram uma grande motivação, apenas que o <code>Adagrad</code> é um otimizador comum, e a função de perda é apropriada para classificação binária (<a href="https://en.wikipedia.org/wiki/Cross_entropy"><em>binary cross entropy</em></a>).</p>
+<h3>1° modelo</h3>
+<p>Para o primeiro modelo, com 100 unidades em uma única camada interna, temos:</p>
+<script src="https://gist.github.com/tutss/744c13a2092b093b7b7dd948abcb16b4.js"></script>
+
+<!-- ```python
+model = nn.Sequential(
+    nn.Linear(input_shape, 100),
+    nn.Linear(100, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(model.parameters())
+loss = nn.BCELoss()
+``` -->
+
+<p>Com a rede construída, precisamos treiná-la para que possa aprender as características dos dados e realizar as previsões. A função de treino:</p>
+<script src="https://gist.github.com/tutss/6e55bb5f4ea271db57dc36da338aa262.js"></script>
+
+<!-- ```python
+def train(model, loss, optimizer, train_values, train_target, val_values, val_target, epochs=50):
+    for e in range(1, epochs+1):
+        optimizer.zero_grad()   
+        output = model(train_values.float())
+        loss_train = loss(output, train_target.float())
+
+<!-- val_output = model(val_values.float())
+        loss_val = loss(val_output, val_target.float())
+
+        loss_train.backward()
+        optimizer.step()
+        if e == 1 or e % 10 == 0:
+            print(f'Epoch {e}: \ttrain loss {loss_train.item():.2f}\t validation loss {loss_val.item():.2f}')
+``` -->
+
+<p>E o loop de treino:</p>
+<script src="https://gist.github.com/tutss/2d70a406f2b65c99044df099a92817c1.js"></script>
+
+<!-- ```python
+train(model, loss, optimizer, X_train_tensor, y_train_tensor, X_val_tensor, y_val_tensor, epochs=150)
+``` -->
+
+<h4>Resultados para o 1° modelo</h4>
+<p>Podemos notar que o 1° modelo não contém uma função de ativação, e portanto, tem problemas em conseguir caracterizar funções mais complexas (não lineares). Um exercício interessante para analisar esse caso, é verificar a superfície de decisão:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="model1pred" src="https://tutss.github.io/images/model1_pred.png"></th>
+<th></th>
+<th align="center"><img alt="model1bound" src="https://tutss.github.io/images/model1_bound.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Predições feitas pelo 1° modelo</td>
+<td></td>
+<td align="center">Superfície de decisão do 1° modelo</td>
+</tr>
+</tbody>
+</table>
+<p>Podemos tentar expandir essa rede (ainda sem funções de ativação) para verificar o impacto do aumento de camadas:</p>
+<script src="https://gist.github.com/tutss/f50499daa9dbf400fba31b1fa8c23943.js"></script>
+
+<!-- ```python
+model = nn.Sequential(
+    nn.Linear(input_shape, 128),
+    nn.Linear(128, 64),
+    nn.Linear(64, 32),
+    nn.Linear(32, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(model.parameters())
+loss = nn.BCELoss()
+``` -->
+
+<p>Obtemos os seguintes resultados:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="model11pred" src="https://tutss.github.io/images/model11_pred.png"></th>
+<th></th>
+<th align="center"><img alt="model11bound" src="https://tutss.github.io/images/model11_bound.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Predições feitas pelo 1° modelo com um maior número de camadas.</td>
+<td></td>
+<td align="center">Superfície de decisão do 1° modelo com um maior número de camadas.</td>
+</tr>
+</tbody>
+</table>
+<p>Analisando as imagens acima, fica evidente que o melhor que a rede consegue é uma reta que separa, mesmo que não perfeitamente, as duas classes (vermelha e azul), coincidindo com o que esperávamos. Pelo fato de estarmos utilizando combinações lineares, padrões não lineares são quase imperceptíveis. </p>
+<h3>2° modelo</h3>
+<p>Agora, iremos introduzir uma função de ativação no modelo, e analisar o resultado obtido. A função de ativação que iremos selecionar é a função ReLU (<a href="https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html#torch.nn.ReLU"><code>nn.ReLU</code></a>), que matematicamente é expressa como: </p>
+<div class="math">$$
+f(x) = max(x, 0)
+$$</div>
+<p>A função ReLU, por definição, é não linear (pela aplicação do máximo), e é comumente utilizada no contexto de redes neurais. Introduzindo a função de ativação, a rede terá maior capacidade de captar comportamentos não lineares nos dados.</p>
+<p>Assim, o modelo fica:</p>
+<script src="https://gist.github.com/tutss/5f947c271a90144963f4d9aefdbcb476.js"></script>
+
+<!-- ```python
+non_linear_model = nn.Sequential(
+    nn.Linear(input_shape, 128),
+    nn.ReLU(),
+    nn.Linear(128, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(non_linear_model.parameters())
+loss = nn.BCELoss()
+``` -->
+
+<p>Treinando o modelo como na etapa anterior, temos a seguinte superfície de decisão:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="relu1pred" src="https://tutss.github.io/images/relu1.png"></th>
+<th></th>
+<th align="center"><img alt="relu1bound" src="https://tutss.github.io/images/relu1_bound.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Predições feitas pelo 2° modelo.</td>
+<td></td>
+<td align="center">Superfície de decisão do 2° modelo.</td>
+</tr>
+</tbody>
+</table>
+<p>Podemos perceber que agora, temos uma superfície mais curvilínea, devido a introdução de não linearidade pela camada <code>nn.ReLU</code>. O resultado seria semelhante caso utilizássemos outra função de ativação (não necessariamente ser igual).</p>
+<h3>Construindo mais modelos</h3>
+<p>Para avaliar como as funções de ativação, atreladas a um maior número de camadas, permitem aproximarmos funções não lineares, iremos construir mais alguns modelos:</p>
+<script src="https://gist.github.com/tutss/7caf231958a5ac53c07c2063e58cc0d8.js"></script>
+
+<!-- ```python
+non_linear_model = nn.Sequential(
+    nn.Linear(input_shape, 128),
+    nn.ReLU(),
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(non_linear_model.parameters())
+loss = nn.BCELoss()
+``` -->
+
+<script src="https://gist.github.com/tutss/a431a5e01f467632d79e2502927c22bd.js"></script>
+
+<!-- ```python
+non_linear_model = nn.Sequential(
+    nn.Linear(input_shape, 256),
+    nn.ReLU(),
+    nn.Linear(256, 128),
+    nn.ReLU(),
+    nn.Linear(128, 64),
+    nn.ReLU(),
+    nn.Linear(64, 1),
+    nn.Sigmoid()
+)
+optimizer = optim.Adagrad(non_linear_model.parameters())
+loss = nn.BCELoss()
+``` -->
+
+<p>Analisando a evolução da superfície de decisão:</p>
+<table>
+<thead>
+<tr>
+<th align="center"><img alt="relu2bound" src="https://tutss.github.io/images/relu2_bound.png"></th>
+<th></th>
+<th align="center"><img alt="relu3bound" src="https://tutss.github.io/images/relu3_bound.png"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center">Predições feitas pelo 3° modelo.</td>
+<td></td>
+<td align="center">Superfície de decisão do 4° modelo.</td>
+</tr>
+</tbody>
+</table>
+<p>Fica evidente que construindo uma rede com mais camadas, atreladas a funções de ativação (não lineares), a nossa superfície de decisão consegue captar mais nuances presentes nos dados, permitindo uma classificação mais acurada. Claro, a ideia aqui é avaliar a superfície em si, já que em um contexto de uma aplicação real seria necessário avaliar também a questão da generalização da rede, que seria o quão bem a rede consegue classificar dados os quais nunca viu.</p>
+<p>Verificamos que introduzindo as funções de ativação, junto ao aumento do número de camadas, nossa rede conseguiu captar as nuances da distribuição não linear dos dados.</p>
+<hr>
+<p>Nesse post, conseguimos analisar brevemente um dos principais impactos de funções de ativação dentro do contexto de redes neurais. O tópico é uma grande área de pesquisa, com constantes novas descobertas, e apenas pincelamos o seu uso dentro do cenário de classificação.</p>
+<p><strong>O post também é acompanhado de um notebook, <a href="https://github.com/tutss/datascience/blob/master/nonlinearity.ipynb">neste link</a>.</strong></p>
+<p>As referências para a construção desse material foram:</p>
+<ul>
+<li><a href="https://pytorch.org/assets/deep-learning/Deep-Learning-with-PyTorch.pdf">Deep Learning with Pytorch</a></li>
+<li><a href="https://www.machinecurve.com/index.php/2020/10/29/why-nonlinear-activation-functions-improve-ml-performance-with-tensorflow-example/">Why nonlinear activation functions improve ML performance</a></li>
+<li><a href="https://stackoverflow.com/questions/28256058/plotting-decision-boundary-of-logistic-regression?noredirect=1&amp;lq=1">Plotting decision boundary of logistic regression</a></li>
+</ul>
+<p>Até o próximo post :)</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+<p class="subheader">Category: <a href="https://tutss.github.io/category/blog.html">Blog</a>
+
+    Tagged: 
+    <a href="https://tutss.github.io/tag/machine-learning.html">machine learning </a>
+    <a href="https://tutss.github.io/tag/data-science.html">data science </a>
+    <a href="https://tutss.github.io/tag/neural-networks.html">neural networks </a>
+    <a href="https://tutss.github.io/tag/pytorch.html">pytorch </a>
+</p>
+
+
+
+
+</article>
+    </div>
+    <!-- End Main Content -->
+
+    <!-- Sidebar -->
+    <aside class="large-2 columns">
+        <!-- <h5 class="sidebar-title">Site</h5> -->
+        <!-- <ul class="side-nav">
+            <li><a href="https://tutss.github.io/archives.html">Archives</a>
+            <li><a href="https://tutss.github.io/tags.html">Tags</a>
+        </ul> -->
+        
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/arturmrsantos/">LinkedIn</a></li>
+            <li><a href="https://github.com/tutss">Github</a></li>
+            <li><a href="mailto:artur_santos@usp.br">Email me</a></li>
+        </ul>
+
+        <!-- 		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://tutss.github.io/category/blog.html">Blog</a></li>
+   
+        </ul>
+ -->
+
+
+    </aside> <!-- End Sidebar -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                               <p>Tuts Blog by Artur Magalhães</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>
