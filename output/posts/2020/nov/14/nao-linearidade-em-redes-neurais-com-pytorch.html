@@ -77,10 +77,9 @@
 <p>Não entraremos em detalhes sobre outros pontos igualmente relevantes no estudo de redes neurais, como funções de perda (<em>loss functions</em>), otimizadores (<em>optimizers</em>), <em>backpropagation</em>, etc. Em especial, iremos analisar o impacto das funções de ativação quando temos um problema de classificação com uma superfície não linear.</p>
 <h3>Exemplo em Pytorch</h3>
 <p>Um neurônio, unidade fundamental de uma rede neural, computa uma função linear do que recebe de entrada:
-</p>
-<div class="math">$$
+$$
 y = w*x + b
-$$</div>
+$$</p>
 <p>Como podemos perceber, essa equação define uma reta. Em <code>Pytorch</code>, podemos descrever essa função como:</p>
 <script src="https://gist.github.com/tutss/eea6c62bd60a5d146613b982e51ab50d.js"></script>
 
@@ -106,16 +105,13 @@ y = model(x)
 </tbody>
 </table>
 <p>Um exemplo comum de função de ativação é a função sigmóide, descrita matematicamente como:
-</p>
-<div class="math">$$
+$$
 f(x) = \frac{1}{1+e^{-x}}
-$$</div>
-<p>
+$$
 A função sigmóide é não linear e o seu resultado são valores no intervalo entre 0 e 1. Ela, como as demais funções de ativação, introduzem o fator não linearidade na rede quando um neurônio computa:
-</p>
-<div class="math">$$
+$$
 f(y) = f(w*x + b) = \frac{1}{1+e^{-(wx+b)}}
-$$</div>
+$$</p>
 <p>No nosso caso, o problema de classificação em questão é obtido pela função <code>make_moons</code> do pacote <code>scikit-learn</code>. Nele, temos duas features que descrevem duas classes, como na figura abaixo.</p>
 <table>
 <thead>
@@ -132,11 +128,10 @@ $$</div>
 <p>Iremos inicialmente montar uma pequena rede, sem nenhuma função de ativação, e verificar a superfície de decisão que ela obtêm.</p>
 <h2>Avaliando as redes no conjunto <em>make_moons</em></h2>
 <p>O pacote <a href="pytorch.org/">Pytorch</a> possui alguns módulos que auxiliam e simplificam a construção de uma rede neural. No nosso caso, iremos utilizar o módulo <code>nn</code>, que contém métodos e classes necessárias para a construção da rede, e o módulo <code>optim</code>, que contém os otimizadores para as redes.</p>
-<p>Primeiro, é importante lembrar que o Pytorch trabalha com uma estrutura de dados chamada <strong>tensor</strong>. Um tensor seria uma generalização de um vetor em <span class="math">\(N\)</span> dimensões. Por exemplo, um vetor é um tensor com 1 dimensão e uma matriz é um tensor com 2 dimensões. O pacote <code>scikit-learn</code>, que contém a função para construirmos o conjunto de dados, utiliza vetores do <code>numpy</code>, e portanto, precisamos convertê-los para a estrutura <code>torch.tensor</code>.</p>
+<p>Primeiro, é importante lembrar que o Pytorch trabalha com uma estrutura de dados chamada <strong>tensor</strong>. Um tensor seria uma generalização de um vetor em $N$ dimensões. Por exemplo, um vetor é um tensor com 1 dimensão e uma matriz é um tensor com 2 dimensões. O pacote <code>scikit-learn</code>, que contém a função para construirmos o conjunto de dados, utiliza vetores do <code>numpy</code>, e portanto, precisamos convertê-los para a estrutura <code>torch.tensor</code>.</p>
 <h3>Convertendo para tensor</h3>
 <p>Obtemos o conjunto de dados:</p>
 <script src="https://gist.github.com/tutss/45d7acb84bac1dde4b7fa7e5ed4321b4.js"></script>
-
 <!-- ```python
 n_samples = 1_000
 X, y = make_moons(n_samples=n_samples, noise=0.1, random_state=42)
@@ -144,14 +139,12 @@ X, y = make_moons(n_samples=n_samples, noise=0.1, random_state=42)
 
 <p>Dividimos o conjunto em treino e teste:</p>
 <script src="https://gist.github.com/tutss/0c8299a296ac50a84b6d564921066e39.js"></script>
-
 <!-- ```python
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.25, random_state=42)
 ``` -->
 
 <p>Convertendo para tensor:</p>
 <script src="https://gist.github.com/tutss/b4fbff0722d824d422bfdb9516883c2d.js"></script>
-
 <!-- ```python
 X_train_tensor = torch.from_numpy(X_train)
 y_train_tensor = torch.from_numpy(y_train).unsqueeze(1)
@@ -163,7 +156,6 @@ y_val_tensor = torch.from_numpy(y_val).unsqueeze(1)
 <h3>Módulos <code>nn</code> e <code>optim</code></h3>
 <p>O módulo <code>nn</code> contém componentes importantes na construção de uma rede, como o tipo das camadas, as funções de perda e ativação que iremos utilizar. Já o módulo <code>optim</code> contém os otimizadores para a rede.</p>
 <script src="https://gist.github.com/tutss/3be84f7f761d67ec251d8465c86a4b46.js"></script>
-
 <!-- ```python
 import torch.nn as nn
 import torch.optim as optim
@@ -176,7 +168,6 @@ import torch.optim as optim
 <h3>1° modelo</h3>
 <p>Para o primeiro modelo, com 100 unidades em uma única camada interna, temos:</p>
 <script src="https://gist.github.com/tutss/744c13a2092b093b7b7dd948abcb16b4.js"></script>
-
 <!-- ```python
 model = nn.Sequential(
     nn.Linear(input_shape, 100),
@@ -189,7 +180,6 @@ loss = nn.BCELoss()
 
 <p>Com a rede construída, precisamos treiná-la para que possa aprender as características dos dados e realizar as previsões. A função de treino:</p>
 <script src="https://gist.github.com/tutss/6e55bb5f4ea271db57dc36da338aa262.js"></script>
-
 <!-- ```python
 def train(model, loss, optimizer, train_values, train_target, val_values, val_target, epochs=50):
     for e in range(1, epochs+1):
@@ -208,7 +198,6 @@ def train(model, loss, optimizer, train_values, train_target, val_values, val_ta
 
 <p>E o loop de treino:</p>
 <script src="https://gist.github.com/tutss/2d70a406f2b65c99044df099a92817c1.js"></script>
-
 <!-- ```python
 train(model, loss, optimizer, X_train_tensor, y_train_tensor, X_val_tensor, y_val_tensor, epochs=150)
 ``` -->
@@ -233,7 +222,6 @@ train(model, loss, optimizer, X_train_tensor, y_train_tensor, X_val_tensor, y_va
 </table>
 <p>Podemos tentar expandir essa rede (ainda sem funções de ativação) para verificar o impacto do aumento de camadas:</p>
 <script src="https://gist.github.com/tutss/f50499daa9dbf400fba31b1fa8c23943.js"></script>
-
 <!-- ```python
 model = nn.Sequential(
     nn.Linear(input_shape, 128),
@@ -266,13 +254,12 @@ loss = nn.BCELoss()
 <p>Analisando as imagens acima, fica evidente que o melhor que a rede consegue é uma reta que separa, mesmo que não perfeitamente, as duas classes (vermelha e azul), coincidindo com o que esperávamos. Pelo fato de estarmos utilizando combinações lineares, padrões não lineares são quase imperceptíveis. </p>
 <h3>2° modelo</h3>
 <p>Agora, iremos introduzir uma função de ativação no modelo, e analisar o resultado obtido. A função de ativação que iremos selecionar é a função ReLU (<a href="https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html#torch.nn.ReLU"><code>nn.ReLU</code></a>), que matematicamente é expressa como: </p>
-<div class="math">$$
+<p>$$
 f(x) = max(x, 0)
-$$</div>
+$$</p>
 <p>A função ReLU, por definição, é não linear (pela aplicação do máximo), e é comumente utilizada no contexto de redes neurais. Introduzindo a função de ativação, a rede terá maior capacidade de captar comportamentos não lineares nos dados.</p>
 <p>Assim, o modelo fica:</p>
 <script src="https://gist.github.com/tutss/5f947c271a90144963f4d9aefdbcb476.js"></script>
-
 <!-- ```python
 non_linear_model = nn.Sequential(
     nn.Linear(input_shape, 128),
@@ -305,7 +292,6 @@ loss = nn.BCELoss()
 <h3>Construindo mais modelos</h3>
 <p>Para avaliar como as funções de ativação, atreladas a um maior número de camadas, permitem aproximarmos funções não lineares, iremos construir mais alguns modelos:</p>
 <script src="https://gist.github.com/tutss/7caf231958a5ac53c07c2063e58cc0d8.js"></script>
-
 <!-- ```python
 non_linear_model = nn.Sequential(
     nn.Linear(input_shape, 128),
@@ -320,7 +306,6 @@ loss = nn.BCELoss()
 ``` -->
 
 <script src="https://gist.github.com/tutss/a431a5e01f467632d79e2502927c22bd.js"></script>
-
 <!-- ```python
 non_linear_model = nn.Sequential(
     nn.Linear(input_shape, 256),
@@ -365,68 +350,6 @@ loss = nn.BCELoss()
 <li><a href="https://stackoverflow.com/questions/28256058/plotting-decision-boundary-of-logistic-regression?noredirect=1&amp;lq=1">Plotting decision boundary of logistic regression</a></li>
 </ul>
 <p>Até o próximo post :)</p>
-<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
-    var align = "center",
-        indent = "0em",
-        linebreak = "false";
-
-    if (false) {
-        align = (screen.width < 768) ? "left" : align;
-        indent = (screen.width < 768) ? "0em" : indent;
-        linebreak = (screen.width < 768) ? 'true' : linebreak;
-    }
-
-    var mathjaxscript = document.createElement('script');
-    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
-    mathjaxscript.type = 'text/javascript';
-    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
-
-    var configscript = document.createElement('script');
-    configscript.type = 'text/x-mathjax-config';
-    configscript[(window.opera ? "innerHTML" : "text")] =
-        "MathJax.Hub.Config({" +
-        "    config: ['MMLorHTML.js']," +
-        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
-        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
-        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
-        "    displayAlign: '"+ align +"'," +
-        "    displayIndent: '"+ indent +"'," +
-        "    showMathMenu: true," +
-        "    messageStyle: 'normal'," +
-        "    tex2jax: { " +
-        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
-        "        displayMath: [ ['$$','$$'] ]," +
-        "        processEscapes: true," +
-        "        preview: 'TeX'," +
-        "    }, " +
-        "    'HTML-CSS': { " +
-        "        availableFonts: ['STIX', 'TeX']," +
-        "        preferredFont: 'STIX'," +
-        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
-        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
-        "    }, " +
-        "}); " +
-        "if ('default' !== 'default') {" +
-            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
-                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
-                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
-                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
-                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
-                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
-            "});" +
-        "}";
-
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
-    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
-}
-</script>
 <p class="subheader">Category: <a href="/category/blog.html">Blog</a>
 
     Tagged: 
