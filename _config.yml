@@ -21,8 +21,8 @@
 title: tuts blog
 # email: artur_santos@alumni.usp.br
 description: >- # this means to ignore newlines until "baseurl:"
-  Hi, I'm Artur! I'm currently a Data Scientist at Amazon, working here
-  in São Paulo. I usually don't post that much, only when I'm feeling really
+  Hi, I'm Artur! I'm currently a Data Scientist at Amazon, working 
+  from São Paulo. I usually don't post that much, only when I'm feeling really
   inspired. Feel free to contact me if you have any questions.
 domain: tutss.github.io
 baseurl: "" # the subpath of your site, e.g. /blog
