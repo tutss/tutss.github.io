@@ -1,12 +1,10 @@
 ---
 layout: post
-title: "Building a Zotero MCP Server for Research Management"
-date: 2025-06-28
+title: "Building a Zotero MCP Server for research management"
+date:   2025-06-29 13:46:33 -0300
 categories: [python, research, mcp, zotero]
 tags: [data-science, automation, api]
 ---
-
-# Building a Zotero MCP Server for research management
 
 As a data scientist working on my Master's thesis, I needed a way to programmatically interact with my Zotero research library. This guide shows how to build a Model Context Protocol (MCP) server for Zotero integration.
 
@@ -33,7 +31,7 @@ MCP consists of 3 main building blocks: **Host** (LLM application/model), **Serv
 
 **Server** is responsible for the tools and how to handle them, while the **Client** can access and use them. Here, I am using Claude Desktop to access my MCP server, but you could add it into your LLM workflow.
 
-**The code for this server can be found on: https://github.com/tutss/datascience/blob/master/agents/zotero_mcp_server.py**
+**The code for this server can be found on: [Github repo](https://github.com/tutss/datascience/blob/master/agents/zotero_mcp_server.py)**
 
 
 |![mcp-example](/files/images/mcp-example.png)|
