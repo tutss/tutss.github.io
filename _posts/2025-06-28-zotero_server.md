@@ -6,6 +6,32 @@ categories: [python, research, mcp, zotero]
 tags: [data-science, automation, api]
 ---
 
+
+--- 
+
+**Edit #1**: It is important to emphasize that to use this MCP server on Claude Desktop you must go into:
+- Claude > Settings > Developer > Edit config
+- On `claude_desktop_config.json`, add the following on `mcpServers`: 
+
+```json
+"zotero": {
+      "command": "python3", 
+      "args": [
+        "/Users/arturmagalhaes/Documents/repos/datascience/agents/zotero_mcp_server.py"
+      ],
+      "env": {
+        "ZOTERO_API_KEY": "your_api_key_here",
+        "ZOTERO_USER_ID": "your_user_id_here",
+        "ZOTERO_LIBRARY_TYPE": "user"
+      }
+    }
+```
+
+Be sure to set the appropriate path and command - it may be just `python`. For me, I set the path directly poiting to my repository.
+
+
+---
+
 As a data scientist working on my Master's thesis, I needed a way to programmatically interact with my Zotero research library. This guide shows how to build a Model Context Protocol (MCP) server for Zotero integration.
 
 I wanted to try this vibe coding thing for a while, to check the current tools out there. For this one, I am using `Claude Sonnet 4` on the Pro plan. So far it has been a great experience. Claude provides great suggestions and given it has a easy way to connect to MCP servers, I decided to go for it.
