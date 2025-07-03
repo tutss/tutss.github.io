@@ -32,6 +32,7 @@ Be sure to set the appropriate path and command - it may be just `python`. For m
 
 ---
 
+
 As a data scientist working on my Master's thesis, I needed a way to programmatically interact with my Zotero research library. This guide shows how to build a Model Context Protocol (MCP) server for Zotero integration.
 
 I wanted to try this vibe coding thing for a while, to check the current tools out there. For this one, I am using `Claude Sonnet 4` on the Pro plan. So far it has been a great experience. Claude provides great suggestions and given it has a easy way to connect to MCP servers, I decided to go for it.
@@ -57,7 +58,7 @@ MCP consists of 3 main building blocks: **Host** (LLM application/model), **Serv
 
 **Server** is responsible for the tools and how to handle them, while the **Client** can access and use them. Here, I am using Claude Desktop to access my MCP server, but you could add it into your LLM workflow.
 
-**The code for this server can be found on: [Github repo](https://github.com/tutss/datascience/blob/master/agents/zotero_mcp_server.py)**
+**The code for this server can be found on: [Github repo](https://github.com/tutss/zotero-mcp-server)**
 
 
 |![mcp-example](/files/images/mcp-example.png)|
