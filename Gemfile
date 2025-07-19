@@ -32,4 +32,8 @@ gem "wdm", "~> 0.1.1", :platforms => [:mingw, :x64_mingw, :mswin]
 # do not have a Java counterpart.
 gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
 
-gem "webrick", "~> 1.8"
+
+
+gem "webrick", ">= 1.8.2"
+gem "rexml", ">= 3.3.9"
+gem "nokogiri", ">= 1.18.8"
