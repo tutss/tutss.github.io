@@ -1,50 +1,1421 @@
-<!DOCTYPE html>
+                this.fridgeItems.forEach(item => this.scene.remove(item.mesh));
+                this.fridgeItems = [];
+                this.createFridgeItems();<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game - Tuts Blog</title>
+    <title>Ice Cube Fridge Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        #gameCanvas {
-            border: 2px solid #333;
-            display: block;
-            margin: 20px auto;
-        }
+        body { margin: 0; padding: 0; background: #000; overflow: hidden; font-family: Arial, sans-serif; }
+        #gameContainer { position: relative; width: 100vw; height: 100vh; }
+        #ui { position: absolute; top: 20px; left: 20px; z-index: 100; }
+        #temperatureBar { width: 200px; height: 20px; border: 2px solid #fff; border-radius: 10px; overflow: hidden; background: #333; }
+        #temperatureFill { height: 100%; width: 0%; background: linear-gradient(to right, #00f, #0ff, #ff0, #f00); transition: all 0.3s; }
+        #stats { color: white; margin-top: 10px; font-size: 14px; }
+        #instructions { position: absolute; bottom: 20px; left: 20px; color: white; font-size: 12px; }
+        #gameOver { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-align: center; font-size: 24px; display: none; }
+        #iceMakerStatus { position: absolute; top: 120px; left: 20px; color: white; font-size: 12px; }
+        #bossStatus { position: absolute; top: 140px; left: 20px; color: #ff6666; font-size: 14px; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Game</h1>
-        <p>A game made by Artur and his brother</p>
-        
-        <canvas id="gameCanvas" width="400" height="300"></canvas>
-        
-        <script>
-            // Your game JavaScript code goes here
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            
-            // Example placeholder game
-            ctx.fillStyle = '#4CAF50';
-            ctx.fillRect(50, 50, 100, 100);
-            ctx.fillStyle = '#333';
-            ctx.font = '20px Arial';
-            ctx.fillText('Your Game Here!', 120, 200);
-        </script>
+    <div id="gameContainer">
+        <div id="ui">
+            <div>Temperature: <span id="tempValue">-10°C</span></div>
+            <div id="temperatureBar"><div id="temperatureFill"></div></div>
+            <div id="stats">
+                <div>Holes Fixed: <span id="holesFixed">0</span></div>
+                <div>Active Holes: <span id="activeHoles">0</span></div>
+            </div>
+            <div id="iceMakerStatus">
+                Ice Maker: <span id="iceMakerIndicator">Standby</span>
+            </div>
+            <div id="bossStatus">
+                BOSS BATTLE - Fire Ball Health: <span id="bossHealth">3</span>
+            </div>
+        </div>
+        <div id="instructions">
+            Use WASD or Arrow Keys to move the ice cube<br>
+            Walk over holes to fix them before you melt!<br>
+            Use the Ice Maker (left wall) to cool down!<br>
+            <span style="color: #ff6666;">BOSS BATTLE: Press SPACEBAR to deflect fire balls back at the boss!</span>
+        </div>
+        <div id="gameOver">
+            <div>GAME OVER!</div>
+            <div>Your ice cube melted!</div>
+            <div style="font-size: 16px; margin-top: 10px;">Press R to restart</div>
+        </div>
     </div>
+
+    <script>
+        class IceCubeGame {
+            constructor() {
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerWidth, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setClearColor(0x222222);
+                this.renderer.shadowMap.enabled = true;
+                this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                document.getElementById('gameContainer').appendChild(this.renderer.domElement);
+
+                this.temperature = -10;
+                this.maxTemperature = 0;
+                this.temperatureIncreaseRate = 0.5;
+                this.holesFixed = 0;
+                this.holes = [];
+                this.keys = {};
+                this.gameRunning = true;
+                this.holeSpawnTimer = 0;
+                this.holeSpawnInterval = 3000;
+
+                this.init();
+                this.setupEventListeners();
+                this.gameLoop();
+            }
+
+            init() {
+                this.createTextures();
+                this.createLights();
+                this.createFridge();
+                this.createFridgeItems();
+                this.createIceCube();
+                this.setupCamera();
+                this.initBossSystem();
+            }
+
+            initBossSystem() {
+                this.bossActive = false;
+                this.bossHealth = 3;
+                this.fireBoss = null;
+                this.iceBat = null;
+                this.fireProjectiles = [];
+                this.bossFireTimer = 0;
+                this.bossFireInterval = 2000;
+                this.recoveryMode = false;
+                this.recoveryTimer = 0;
+                this.recoveryDuration = 5000;
+                this.nextBossThreshold = 10;
+            }
+
+            createTextures() {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+
+                // Floor texture - subtle grid pattern
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, 512, 512);
+                ctx.strokeStyle = '#f5f5f5';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 512; i += 32) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, 512);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(512, i);
+                    ctx.stroke();
+                }
+                this.floorTexture = new THREE.CanvasTexture(canvas);
+                this.floorTexture.wrapS = THREE.RepeatWrapping;
+                this.floorTexture.wrapT = THREE.RepeatWrapping;
+                this.floorTexture.repeat.set(4, 4);
+
+                // Wall texture - vertical lines
+                const wallCanvas = document.createElement('canvas');
+                wallCanvas.width = 256;
+                wallCanvas.height = 256;
+                const wallCtx = wallCanvas.getContext('2d');
+                wallCtx.fillStyle = '#f8f8f8';
+                wallCtx.fillRect(0, 0, 256, 256);
+                wallCtx.strokeStyle = '#f0f0f0';
+                wallCtx.lineWidth = 2;
+                for (let i = 0; i < 256; i += 16) {
+                    wallCtx.beginPath();
+                    wallCtx.moveTo(i, 0);
+                    wallCtx.lineTo(i, 256);
+                    wallCtx.stroke();
+                }
+                this.wallTexture = new THREE.CanvasTexture(wallCanvas);
+                this.wallTexture.wrapS = THREE.RepeatWrapping;
+                this.wallTexture.wrapT = THREE.RepeatWrapping;
+                this.wallTexture.repeat.set(2, 2);
+
+                // Ice texture - crystalline pattern
+                const iceCanvas = document.createElement('canvas');
+                iceCanvas.width = 128;
+                iceCanvas.height = 128;
+                const iceCtx = iceCanvas.getContext('2d');
+                iceCtx.fillStyle = '#88ddff';
+                iceCtx.fillRect(0, 0, 128, 128);
+                
+                // Add crystalline pattern
+                iceCtx.strokeStyle = '#aaeeff';
+                iceCtx.lineWidth = 1;
+                for (let i = 0; i < 20; i++) {
+                    const x1 = Math.random() * 128;
+                    const y1 = Math.random() * 128;
+                    const x2 = x1 + (Math.random() - 0.5) * 40;
+                    const y2 = y1 + (Math.random() - 0.5) * 40;
+                    iceCtx.beginPath();
+                    iceCtx.moveTo(x1, y1);
+                    iceCtx.lineTo(x2, y2);
+                    iceCtx.stroke();
+                }
+                this.iceTexture = new THREE.CanvasTexture(iceCanvas);
+
+                // Metal texture for vents
+                const metalCanvas = document.createElement('canvas');
+                metalCanvas.width = 256;
+                metalCanvas.height = 256;
+                const metalCtx = metalCanvas.getContext('2d');
+                metalCtx.fillStyle = '#dddddd';
+                metalCtx.fillRect(0, 0, 256, 256);
+                
+                // Add brushed metal effect
+                metalCtx.strokeStyle = '#cccccc';
+                metalCtx.lineWidth = 1;
+                for (let i = 0; i < 256; i += 2) {
+                    metalCtx.globalAlpha = Math.random() * 0.3 + 0.1;
+                    metalCtx.beginPath();
+                    metalCtx.moveTo(0, i);
+                    metalCtx.lineTo(256, i);
+                    metalCtx.stroke();
+                }
+                metalCtx.globalAlpha = 1;
+                this.metalTexture = new THREE.CanvasTexture(metalCanvas);
+                this.metalTexture.wrapS = THREE.RepeatWrapping;
+                this.metalTexture.wrapT = THREE.RepeatWrapping;
+
+                // Ice cream box texture
+                const iceCreamCanvas = document.createElement('canvas');
+                iceCreamCanvas.width = 256;
+                iceCreamCanvas.height = 256;
+                const iceCreamCtx = iceCreamCanvas.getContext('2d');
+                
+                // Main background
+                iceCreamCtx.fillStyle = '#4a90e2';
+                iceCreamCtx.fillRect(0, 0, 256, 256);
+                
+                // Brand strip
+                iceCreamCtx.fillStyle = '#ffffff';
+                iceCreamCtx.fillRect(0, 60, 256, 40);
+                iceCreamCtx.fillStyle = '#2c5aa0';
+                iceCreamCtx.font = 'bold 18px Arial';
+                iceCreamCtx.fillText('PREMIUM', 90, 85);
+                
+                // Product name
+                iceCreamCtx.fillStyle = '#ffffff';
+                iceCreamCtx.font = 'bold 24px Arial';
+                iceCreamCtx.fillText('ICE CREAM', 65, 140);
+                iceCreamCtx.font = '14px Arial';
+                iceCreamCtx.fillText('Vanilla Bean', 85, 160);
+                
+                // Ice cream scoops decoration
+                iceCreamCtx.fillStyle = '#fff8dc';
+                iceCreamCtx.beginPath();
+                iceCreamCtx.arc(50, 200, 15, 0, Math.PI * 2);
+                iceCreamCtx.fill();
+                iceCreamCtx.beginPath();
+                iceCreamCtx.arc(200, 200, 15, 0, Math.PI * 2);
+                iceCreamCtx.fill();
+                
+                // Barcode
+                iceCreamCtx.fillStyle = '#000000';
+                for (let i = 0; i < 20; i++) {
+                    iceCreamCtx.fillRect(20 + i * 4, 220, 2, 20);
+                }
+                
+                this.iceCreamTexture = new THREE.CanvasTexture(iceCreamCanvas);
+
+                // Beer pack texture
+                const beerCanvas = document.createElement('canvas');
+                beerCanvas.width = 256;
+                beerCanvas.height = 256;
+                const beerCtx = beerCanvas.getContext('2d');
+                
+                // Main background
+                beerCtx.fillStyle = '#8b4513';
+                beerCtx.fillRect(0, 0, 256, 256);
+                
+                // Brand header
+                beerCtx.fillStyle = '#ffd700';
+                beerCtx.fillRect(0, 20, 256, 50);
+                beerCtx.fillStyle = '#8b4513';
+                beerCtx.font = 'bold 20px Arial';
+                beerCtx.fillText('COLD BREW', 80, 50);
+                
+                // 6-pack indication
+                beerCtx.fillStyle = '#ffffff';
+                beerCtx.font = 'bold 32px Arial';
+                beerCtx.fillText('6', 30, 130);
+                beerCtx.font = '16px Arial';
+                beerCtx.fillText('PACK', 60, 130);
+                
+                // Beer bottle outlines
+                beerCtx.strokeStyle = '#654321';
+                beerCtx.lineWidth = 3;
+                for (let i = 0; i < 6; i++) {
+                    const row = Math.floor(i / 3);
+                    const col = i % 3;
+                    const x = 130 + col * 35;
+                    const y = 90 + row * 60;
+                    beerCtx.strokeRect(x, y, 20, 50);
+                    beerCtx.fillStyle = '#ddd';
+                    beerCtx.fillRect(x + 5, y - 5, 10, 8);
+                }
+                
+                // Premium label
+                beerCtx.fillStyle = '#ffd700';
+                beerCtx.font = '12px Arial';
+                beerCtx.fillText('PREMIUM', 30, 200);
+                beerCtx.fillText('QUALITY', 30, 215);
+                
+                this.beerTexture = new THREE.CanvasTexture(beerCanvas);
+
+                // Strawberry bag texture
+                const strawberryCanvas = document.createElement('canvas');
+                strawberryCanvas.width = 256;
+                strawberryCanvas.height = 256;
+                const strawberryCtx = strawberryCanvas.getContext('2d');
+                
+                // Plastic bag background
+                strawberryCtx.fillStyle = '#ffffff';
+                strawberryCtx.fillRect(0, 0, 256, 256);
+                strawberryCtx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                strawberryCtx.fillRect(0, 0, 256, 256);
+                
+                // Brand label
+                strawberryCtx.fillStyle = '#e74c3c';
+                strawberryCtx.fillRect(20, 30, 216, 60);
+                strawberryCtx.fillStyle = '#ffffff';
+                strawberryCtx.font = 'bold 18px Arial';
+                strawberryCtx.fillText('FROZEN', 100, 55);
+                strawberryCtx.font = 'bold 22px Arial';
+                strawberryCtx.fillText('STRAWBERRIES', 60, 80);
+                
+                // Strawberry illustrations
+                for (let i = 0; i < 12; i++) {
+                    const x = 40 + (i % 4) * 45;
+                    const y = 120 + Math.floor(i / 4) * 35;
+                    
+                    // Strawberry body
+                    strawberryCtx.fillStyle = '#ff4757';
+                    strawberryCtx.beginPath();
+                    strawberryCtx.ellipse(x, y, 12, 16, 0, 0, Math.PI * 2);
+                    strawberryCtx.fill();
+                    
+                    // Strawberry top
+                    strawberryCtx.fillStyle = '#2ed573';
+                    strawberryCtx.fillRect(x - 8, y - 18, 16, 8);
+                    
+                    // Seeds
+                    strawberryCtx.fillStyle = '#ffffff';
+                    for (let j = 0; j < 6; j++) {
+                        const seedX = x - 6 + (j % 3) * 4;
+                        const seedY = y - 8 + Math.floor(j / 3) * 6;
+                        strawberryCtx.fillRect(seedX, seedY, 1, 1);
+                    }
+                }
+                
+                // Weight indicator
+                strawberryCtx.fillStyle = '#2c3e50';
+                strawberryCtx.font = '14px Arial';
+                strawberryCtx.fillText('Net Wt. 500g', 80, 240);
+                
+                this.strawberryTexture = new THREE.CanvasTexture(strawberryCanvas);
+            }
+
+            createLights() {
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+                this.scene.add(ambientLight);
+
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(10, 10, 5);
+                directionalLight.castShadow = true;
+                directionalLight.shadow.mapSize.width = 2048;
+                directionalLight.shadow.mapSize.height = 2048;
+                directionalLight.shadow.camera.near = 0.5;
+                directionalLight.shadow.camera.far = 50;
+                directionalLight.shadow.camera.left = -15;
+                directionalLight.shadow.camera.right = 15;
+                directionalLight.shadow.camera.top = 15;
+                directionalLight.shadow.camera.bottom = -15;
+                directionalLight.shadow.bias = -0.0001;
+                this.scene.add(directionalLight);
+
+                const fridgeLight = new THREE.PointLight(0xffffff, 0.5, 20);
+                fridgeLight.position.set(0, 8, 0);
+                this.scene.add(fridgeLight);
+            }
+
+            createFridge() {
+                const floorGeometry = new THREE.PlaneGeometry(20, 20);
+                const floorMaterial = new THREE.MeshLambertMaterial({ 
+                    map: this.floorTexture,
+                    color: 0xffffff
+                });
+                this.floor = new THREE.Mesh(floorGeometry, floorMaterial);
+                this.floor.rotation.x = -Math.PI / 2;
+                this.floor.position.y = -0.01;
+                this.floor.receiveShadow = true;
+                this.scene.add(this.floor);
+
+                const wallGeometry = new THREE.PlaneGeometry(16, 10);
+                const wallMaterial = new THREE.MeshLambertMaterial({ 
+                    map: this.wallTexture,
+                    color: 0xf8f8f8
+                });
+
+                const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
+                backWall.position.set(0, 5, -8);
+                this.scene.add(backWall);
+
+                const leftWall = new THREE.Mesh(wallGeometry, wallMaterial);
+                leftWall.rotation.y = Math.PI / 2;
+                leftWall.position.set(-8, 5, 0);
+                this.scene.add(leftWall);
+
+                const rightWall = new THREE.Mesh(wallGeometry, wallMaterial);
+                rightWall.rotation.y = -Math.PI / 2;
+                rightWall.position.set(8, 5, 0);
+                this.scene.add(rightWall);
+
+                this.createFridgeVents();
+                this.createFridgeShelves();
+                this.createIceCubeMaker();
+            }
+
+            createFridgeItems() {
+                this.fridgeItems = [];
+
+                // Ice cream box (largest item)
+                const iceCreamGeometry = new THREE.BoxGeometry(3, 2.2, 1.8);
+                const iceCreamMaterial = new THREE.MeshLambertMaterial({ map: this.iceCreamTexture });
+                const iceCreamBox = new THREE.Mesh(iceCreamGeometry, iceCreamMaterial);
+                iceCreamBox.position.set(-4.5, 1.1, -5.5);
+                iceCreamBox.castShadow = true;
+                iceCreamBox.receiveShadow = true;
+                this.scene.add(iceCreamBox);
+                this.fridgeItems.push({ 
+                    mesh: iceCreamBox, 
+                    bounds: { x: -4.5, z: -5.5, width: 3, height: 1.8 } 
+                });
+
+                // Beer pack (second largest) - no individual bottles
+                const beerGeometry = new THREE.BoxGeometry(3.5, 1.4, 2.2);
+                const beerMaterial = new THREE.MeshLambertMaterial({ map: this.beerTexture });
+                const beerPack = new THREE.Mesh(beerGeometry, beerMaterial);
+                beerPack.position.set(4, 0.7, 3.5);
+                beerPack.castShadow = true;
+                beerPack.receiveShadow = true;
+                this.scene.add(beerPack);
+                this.fridgeItems.push({ 
+                    mesh: beerPack, 
+                    bounds: { x: 4, z: 3.5, width: 3.5, height: 2.2 } 
+                });
+
+                // Strawberry bag (smaller)
+                const strawberryGeometry = new THREE.BoxGeometry(1.8, 1, 1.2);
+                strawberryGeometry.scale(1, 1.3, 1);
+                const strawberryMaterial = new THREE.MeshLambertMaterial({ 
+                    map: this.strawberryTexture,
+                    transparent: true,
+                    opacity: 0.95
+                });
+                const strawberryBag = new THREE.Mesh(strawberryGeometry, strawberryMaterial);
+                strawberryBag.position.set(-1.5, 0.5, 5.2);
+                strawberryBag.rotation.y = Math.PI / 8;
+                strawberryBag.castShadow = true;
+                strawberryBag.receiveShadow = true;
+                this.scene.add(strawberryBag);
+                this.fridgeItems.push({ 
+                    mesh: strawberryBag, 
+                    bounds: { x: -1.5, z: 5.2, width: 1.8, height: 1.2 } 
+                });
+
+                // Frozen peas container (medium size)
+                const peasGeometry = new THREE.CylinderGeometry(0.9, 0.9, 1.4);
+                const peasMaterial = new THREE.MeshLambertMaterial({ color: 0x90ee90 });
+                const peasContainer = new THREE.Mesh(peasGeometry, peasMaterial);
+                peasContainer.position.set(1.8, 0.7, -3.8);
+                peasContainer.castShadow = true;
+                peasContainer.receiveShadow = true;
+                this.scene.add(peasContainer);
+                this.fridgeItems.push({ 
+                    mesh: peasContainer, 
+                    bounds: { x: 1.8, z: -3.8, width: 1.8, height: 1.8 } 
+                });
+
+                // Frozen pizza box (flat and wide)
+                const pizzaGeometry = new THREE.BoxGeometry(2.5, 0.4, 2.5);
+                const pizzaMaterial = new THREE.MeshLambertMaterial({ color: 0xd2691e });
+                const pizzaBox = new THREE.Mesh(pizzaGeometry, pizzaMaterial);
+                pizzaBox.position.set(-0.5, 0.2, -1.5);
+                pizzaBox.castShadow = true;
+                pizzaBox.receiveShadow = true;
+                this.scene.add(pizzaBox);
+                this.fridgeItems.push({ 
+                    mesh: pizzaBox, 
+                    bounds: { x: -0.5, z: -1.5, width: 2.5, height: 2.5 } 
+                });
+            }
+
+            createFridgeVents() {
+                const ventGeometry = new THREE.PlaneGeometry(12, 1.5);
+                const ventMaterial = new THREE.MeshLambertMaterial({ 
+                    map: this.metalTexture,
+                    color: 0xdddddd 
+                });
+                
+                const topVent = new THREE.Mesh(ventGeometry, ventMaterial);
+                topVent.position.set(0, 9, -7.9);
+                this.scene.add(topVent);
+
+                const slatMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0xcccccc
+                });
+
+                for (let i = 0; i < 8; i++) {
+                    const slat = new THREE.Mesh(new THREE.PlaneGeometry(11, 0.1), slatMaterial);
+                    slat.position.set(0, 9 + (i - 3.5) * 0.15, -7.8);
+                    this.scene.add(slat);
+                }
+
+                const sideVentGeometry = new THREE.PlaneGeometry(1.5, 8);
+                const leftVent = new THREE.Mesh(sideVentGeometry, ventMaterial);
+                leftVent.rotation.y = Math.PI / 2;
+                leftVent.position.set(-7.9, 5, 0);
+                this.scene.add(leftVent);
+
+                for (let i = 0; i < 6; i++) {
+                    const slat = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 7), slatMaterial);
+                    slat.rotation.y = Math.PI / 2;
+                    slat.position.set(-7.8, 5 + (i - 2.5) * 1.2, 0);
+                    this.scene.add(slat);
+                }
+            }
+
+            createFridgeShelves() {
+                const shelfGeometry = new THREE.BoxGeometry(14, 0.2, 1);
+                const shelfMaterial = new THREE.MeshLambertMaterial({ color: 0xf0f0f0 });
+                
+                const shelf1 = new THREE.Mesh(shelfGeometry, shelfMaterial);
+                shelf1.position.set(0, 6, -7);
+                shelf1.castShadow = true;
+                this.scene.add(shelf1);
+
+                const shelf2 = new THREE.Mesh(shelfGeometry, shelfMaterial);
+                shelf2.position.set(0, 3, -7);
+                shelf2.castShadow = true;
+                this.scene.add(shelf2);
+
+                const doorSealGeometry = new THREE.BoxGeometry(0.3, 10, 16.5);
+                const doorSealMaterial = new THREE.MeshLambertMaterial({ color: 0xe0e0e0 });
+                const doorSeal = new THREE.Mesh(doorSealGeometry, doorSealMaterial);
+                doorSeal.position.set(8.2, 5, 0);
+                this.scene.add(doorSeal);
+            }
+
+            createIceCubeMaker() {
+                // Main ice cube maker housing
+                const makerGeometry = new THREE.BoxGeometry(0.6, 2, 1.5);
+                const makerMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x333333,
+                    shininess: 50
+                });
+                this.iceCubeMaker = new THREE.Mesh(makerGeometry, makerMaterial);
+                this.iceCubeMaker.position.set(-7.7, 1, 0);
+                this.iceCubeMaker.castShadow = true;
+                this.scene.add(this.iceCubeMaker);
+
+                // Ice cube maker opening/slot
+                const slotGeometry = new THREE.BoxGeometry(0.1, 0.8, 1);
+                const slotMaterial = new THREE.MeshLambertMaterial({ 
+                    color: 0x111111,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const slot = new THREE.Mesh(slotGeometry, slotMaterial);
+                slot.position.set(-7.5, 1, 0);
+                this.scene.add(slot);
+
+                // Control panel
+                const panelGeometry = new THREE.PlaneGeometry(0.8, 0.4);
+                const panelMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x444444,
+                    shininess: 80
+                });
+                const panel = new THREE.Mesh(panelGeometry, panelMaterial);
+                panel.rotation.y = Math.PI / 2;
+                panel.position.set(-7.6, 1.8, 0);
+                this.scene.add(panel);
+
+                // LED indicator
+                const ledGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+                this.ledMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x00ff00,
+                    emissive: 0x002200,
+                    shininess: 200
+                });
+                this.iceMakerLED = new THREE.Mesh(ledGeometry, this.ledMaterial);
+                this.iceMakerLED.position.set(-7.55, 1.9, 0.2);
+                this.scene.add(this.iceMakerLED);
+
+                // Ice cube maker bounds for collision detection
+                this.iceMakerBounds = { x: -7.7, z: 0, width: 0.6, height: 1.5 };
+                this.isUsingIceMaker = false;
+                this.iceMakerCooldownTimer = 0;
+            }
+
+            createIceCube() {
+                this.iceCubeGroup = new THREE.Group();
+                
+                const cubeGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
+                const cubeMaterial = new THREE.MeshPhongMaterial({ 
+                    map: this.iceTexture,
+                    color: 0x88ddff, 
+                    transparent: true, 
+                    opacity: 0.8,
+                    shininess: 100
+                });
+                this.iceCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                this.iceCube.castShadow = true;
+                this.iceCubeGroup.add(this.iceCube);
+
+                const glassesGroup = new THREE.Group();
+                
+                const frameGeometry = new THREE.TorusGeometry(0.15, 0.02, 8, 16);
+                const frameMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x333333,
+                    shininess: 80
+                });
+                
+                const leftLens = new THREE.Mesh(frameGeometry, frameMaterial);
+                leftLens.position.set(-0.2, 0.15, 0.4);
+                leftLens.rotation.y = Math.PI / 2;
+                glassesGroup.add(leftLens);
+                
+                const rightLens = new THREE.Mesh(frameGeometry, frameMaterial);
+                rightLens.position.set(0.2, 0.15, 0.4);
+                rightLens.rotation.y = Math.PI / 2;
+                glassesGroup.add(rightLens);
+                
+                const bridgeGeometry = new THREE.CylinderGeometry(0.015, 0.015, 0.25);
+                const bridge = new THREE.Mesh(bridgeGeometry, frameMaterial);
+                bridge.position.set(0, 0.15, 0.4);
+                bridge.rotation.z = Math.PI / 2;
+                glassesGroup.add(bridge);
+                
+                const leftArmGeometry = new THREE.CylinderGeometry(0.015, 0.015, 0.3);
+                const leftArm = new THREE.Mesh(leftArmGeometry, frameMaterial);
+                leftArm.position.set(-0.3, 0.15, 0.25);
+                leftArm.rotation.x = -Math.PI / 6;
+                leftArm.rotation.z = Math.PI / 2;
+                glassesGroup.add(leftArm);
+                
+                const rightArm = new THREE.Mesh(leftArmGeometry, frameMaterial);
+                rightArm.position.set(0.3, 0.15, 0.25);
+                rightArm.rotation.x = -Math.PI / 6;
+                rightArm.rotation.z = Math.PI / 2;
+                glassesGroup.add(rightArm);
+
+                const lensGeometry = new THREE.CircleGeometry(0.13, 16);
+                const lensMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x4444ff, 
+                    transparent: true, 
+                    opacity: 0.3,
+                    side: THREE.DoubleSide,
+                    shininess: 150
+                });
+                
+                const leftGlass = new THREE.Mesh(lensGeometry, lensMaterial);
+                leftGlass.position.set(-0.2, 0.15, 0.41);
+                glassesGroup.add(leftGlass);
+                
+                const rightGlass = new THREE.Mesh(lensGeometry, lensMaterial);
+                rightGlass.position.set(0.2, 0.15, 0.41);
+                glassesGroup.add(rightGlass);
+
+                const eyeGeometry = new THREE.SphereGeometry(0.05, 8, 8);
+                const eyeMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x000000,
+                    shininess: 200
+                });
+                
+                const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+                leftEye.position.set(-0.15, 0.1, 0.35);
+                glassesGroup.add(leftEye);
+                
+                const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+                rightEye.position.set(0.15, 0.1, 0.35);
+                glassesGroup.add(rightEye);
+
+                this.iceCubeGroup.add(glassesGroup);
+                
+                // Find a safe spawn position for the ice cube
+                this.findSafeSpawnPosition();
+                
+                this.scene.add(this.iceCubeGroup);
+            }
+
+            setupCamera() {
+                this.camera.position.set(0, 12, 12);
+                this.camera.lookAt(0, 0, 0);
+            }
+
+            createHole(x, z) {
+                const holeGeometry = new THREE.CircleGeometry(0.8, 16);
+                
+                // Create a radial gradient texture for the hole
+                const holeCanvas = document.createElement('canvas');
+                holeCanvas.width = 128;
+                holeCanvas.height = 128;
+                const holeCtx = holeCanvas.getContext('2d');
+                
+                const gradient = holeCtx.createRadialGradient(64, 64, 0, 64, 64, 64);
+                gradient.addColorStop(0, '#000000');
+                gradient.addColorStop(0.7, '#111111');
+                gradient.addColorStop(1, '#333333');
+                
+                holeCtx.fillStyle = gradient;
+                holeCtx.fillRect(0, 0, 128, 128);
+                
+                const holeTexture = new THREE.CanvasTexture(holeCanvas);
+                
+                const holeMaterial = new THREE.MeshLambertMaterial({ 
+                    map: holeTexture,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const hole = new THREE.Mesh(holeGeometry, holeMaterial);
+                hole.rotation.x = -Math.PI / 2;
+                hole.position.set(x, 0.01, z);
+                hole.userData = { 
+                    type: 'hole', 
+                    id: Math.random(),
+                    creationTime: Date.now()
+                };
+                this.scene.add(hole);
+                this.holes.push(hole);
+            }
+
+            spawnRandomHole() {
+                let attempts = 0;
+                let validPosition = false;
+                let x, z;
+
+                while (!validPosition && attempts < 20) {
+                    x = (Math.random() - 0.5) * 14;
+                    z = (Math.random() - 0.5) * 14;
+                    
+                    validPosition = true;
+                    
+                    // Check if position conflicts with fridge items
+                    for (const item of this.fridgeItems) {
+                        const bounds = item.bounds;
+                        const itemLeft = bounds.x - bounds.width / 2;
+                        const itemRight = bounds.x + bounds.width / 2;
+                        const itemTop = bounds.z - bounds.height / 2;
+                        const itemBottom = bounds.z + bounds.height / 2;
+                        
+                        if (x >= itemLeft - 1 && x <= itemRight + 1 && 
+                            z >= itemTop - 1 && z <= itemBottom + 1) {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                    
+                    // Check if position conflicts with ice cube
+                    const cubePos = this.iceCubeGroup.position;
+                    const distanceFromCube = Math.sqrt(
+                        Math.pow(x - cubePos.x, 2) + Math.pow(z - cubePos.z, 2)
+                    );
+                    if (distanceFromCube < 2) {
+                        validPosition = false;
+                    }
+                    
+                    attempts++;
+                }
+                
+                if (validPosition) {
+                    this.createHole(x, z);
+                }
+            }
+
+            updateTemperature() {
+                // During boss battle, temperature doesn't increase from holes or decrease from ice maker
+                if (this.bossActive) {
+                    // Temperature is only affected by fire ball hits during boss battle
+                    this.temperature = Math.min(this.temperature, this.maxTemperature);
+                    this.temperature = Math.max(this.temperature, -10);
+                } else {
+                    // Normal temperature mechanics when not in boss battle
+                    const holeCount = this.holes.length;
+                    if (holeCount > 0) {
+                        this.temperature += this.temperatureIncreaseRate * holeCount * 0.016;
+                    }
+                    
+                    // Check if ice cube is using the ice maker
+                    this.checkIceMakerUsage();
+                    
+                    this.temperature = Math.min(this.temperature, this.maxTemperature);
+                    this.temperature = Math.max(this.temperature, -10);
+                }
+                
+                const tempPercent = ((this.temperature - (-10)) / (this.maxTemperature - (-10))) * 100;
+                document.getElementById('temperatureFill').style.width = tempPercent + '%';
+                document.getElementById('tempValue').textContent = this.temperature.toFixed(1) + '°C';
+                
+                if (this.temperature >= this.maxTemperature) {
+                    this.gameOver();
+                }
+            }
+
+            checkIceMakerUsage() {
+                const cubePos = this.iceCubeGroup.position;
+                const bounds = this.iceMakerBounds;
+                const distance = Math.sqrt(
+                    Math.pow(cubePos.x - bounds.x, 2) + 
+                    Math.pow(cubePos.z - bounds.z, 2)
+                );
+                
+                if (distance < 1.2) {
+                    if (!this.isUsingIceMaker) {
+                        this.isUsingIceMaker = true;
+                        this.iceMakerCooldownTimer = 0;
+                        // Change LED to blue when active
+                        this.ledMaterial.color.setHex(0x0088ff);
+                        this.ledMaterial.emissive.setHex(0x002244);
+                    }
+                    
+                    // Cool down temperature while using ice maker
+                    this.iceMakerCooldownTimer += 16;
+                    if (this.iceMakerCooldownTimer >= 500) { // Every 500ms
+                        this.temperature -= this.temperatureIncreaseRate * 2; // Cool down faster than heating
+                        this.iceMakerCooldownTimer = 0;
+                    }
+                    
+                    // Add cooling particles effect
+                    this.addCoolingEffect();
+                } else {
+                    if (this.isUsingIceMaker) {
+                        this.isUsingIceMaker = false;
+                        // Change LED back to green when inactive
+                        this.ledMaterial.color.setHex(0x00ff00);
+                        this.ledMaterial.emissive.setHex(0x002200);
+                    }
+                }
+            }
+
+            addCoolingEffect() {
+                // Create small cooling particles
+                if (Math.random() < 0.3) {
+                    const particleGeometry = new THREE.SphereGeometry(0.02, 4, 4);
+                    const particleMaterial = new THREE.MeshBasicMaterial({ 
+                        color: 0x88ddff,
+                        transparent: true,
+                        opacity: 0.7
+                    });
+                    const particle = new THREE.Mesh(particleGeometry, particleMaterial);
+                    particle.position.set(
+                        -7.5 + (Math.random() - 0.5) * 0.5,
+                        0.5 + Math.random() * 1,
+                        (Math.random() - 0.5) * 0.8
+                    );
+                    
+                    this.scene.add(particle);
+                    
+                    // Animate particle upward and fade out
+                    const animateParticle = () => {
+                        particle.position.y += 0.02;
+                        particle.material.opacity -= 0.02;
+                        
+                        if (particle.material.opacity <= 0) {
+                            this.scene.remove(particle);
+                        } else {
+                            requestAnimationFrame(animateParticle);
+                        }
+                    };
+                    animateParticle();
+                }
+            }
+
+            checkCollisions() {
+                if (this.bossActive) {
+                    this.checkBossCollisions();
+                    return;
+                }
+                
+                const cubePos = this.iceCubeGroup.position;
+                
+                for (let i = this.holes.length - 1; i >= 0; i--) {
+                    const hole = this.holes[i];
+                    const holePos = hole.position;
+                    const distance = Math.sqrt(
+                        Math.pow(cubePos.x - holePos.x, 2) + 
+                        Math.pow(cubePos.z - holePos.z, 2)
+                    );
+                    
+                    if (distance < 0.9) {
+                        this.scene.remove(hole);
+                        this.holes.splice(i, 1);
+                        this.holesFixed++;
+                        
+                        // Check if boss battle should start
+                        if (this.holesFixed >= this.nextBossThreshold && !this.bossActive) {
+                            this.startBossBattle();
+                        }
+                    }
+                }
+            }
+
+            startBossBattle() {
+                this.bossActive = true;
+                this.bossHealth = 3;
+                this.nextBossThreshold += 10;
+                this.temperature = -10; // Reset temperature to minimum (-10°C) when boss appears
+                
+                // Clear existing holes
+                this.holes.forEach(hole => this.scene.remove(hole));
+                this.holes = [];
+                
+                this.createFireBoss();
+                this.createIceBat();
+            }
+
+            createFireBoss() {
+                // Fire boss sphere
+                const bossGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+                const bossMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xff4500,
+                    emissive: 0x441100,
+                    shininess: 50
+                });
+                this.fireBoss = new THREE.Mesh(bossGeometry, bossMaterial);
+                
+                // Position on random shelf
+                const shelfPositions = [
+                    { x: 0, y: 6, z: -7 },
+                    { x: 0, y: 3, z: -7 }
+                ];
+                const selectedShelf = shelfPositions[Math.floor(Math.random() * shelfPositions.length)];
+                this.fireBoss.position.set(selectedShelf.x, selectedShelf.y + 1, selectedShelf.z);
+                this.fireBoss.castShadow = true;
+                
+                // Add flame effects
+                this.createBossFlameEffects();
+                
+                this.scene.add(this.fireBoss);
+            }
+
+            createBossFlameEffects() {
+                // Create flame particles around boss
+                this.bossFlames = [];
+                for (let i = 0; i < 8; i++) {
+                    const flameGeometry = new THREE.SphereGeometry(0.1, 6, 6);
+                    const flameMaterial = new THREE.MeshBasicMaterial({ 
+                        color: 0xff6600,
+                        transparent: true,
+                        opacity: 0.8
+                    });
+                    const flame = new THREE.Mesh(flameGeometry, flameMaterial);
+                    const angle = (i / 8) * Math.PI * 2;
+                    flame.position.set(
+                        Math.cos(angle) * 1.2,
+                        Math.sin(Date.now() * 0.01 + i) * 0.3,
+                        Math.sin(angle) * 1.2
+                    );
+                    this.fireBoss.add(flame);
+                    this.bossFlames.push(flame);
+                }
+            }
+
+            createIceBat() {
+                const batGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.5);
+                const batMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0x88ddff,
+                    transparent: true,
+                    opacity: 0.9,
+                    shininess: 100
+                });
+                this.iceBat = new THREE.Mesh(batGeometry, batMaterial);
+                this.iceBat.rotation.z = Math.PI / 2;
+                this.iceBat.position.set(0.8, 0.2, 0);
+                this.iceBat.userData = { baseRotation: 0, swinging: false };
+                this.iceCubeGroup.add(this.iceBat);
+            }
+
+            checkBossCollisions() {
+                if (!this.fireBoss) return;
+                
+                const cubePos = this.iceCubeGroup.position;
+                const bossPos = this.fireBoss.position;
+                
+                // Check if ice cube hits fire projectiles with bat (SPACE key)
+                if (this.keys[' '] && !this.batSwingCooldown) {
+                    this.swingBat();
+                    this.batSwingCooldown = true;
+                    setTimeout(() => { this.batSwingCooldown = false; }, 300);
+                    
+                    // Check for projectiles near the ice cube to deflect
+                    for (let i = this.fireProjectiles.length - 1; i >= 0; i--) {
+                        const projectile = this.fireProjectiles[i];
+                        const projPos = projectile.position;
+                        const distance = Math.sqrt(
+                            Math.pow(cubePos.x - projPos.x, 2) + 
+                            Math.pow(cubePos.z - projPos.z, 2)
+                        );
+                        
+                        if (distance < 1.5) { // Deflection range
+                            this.deflectProjectile(projectile);
+                            break; // Only deflect one projectile per swing
+                        }
+                    }
+                }
+                
+                // Check fire projectile collisions with ice cube (if not deflected)
+                for (let i = this.fireProjectiles.length - 1; i >= 0; i--) {
+                    const projectile = this.fireProjectiles[i];
+                    if (projectile.userData.deflected) continue; // Skip deflected projectiles
+                    
+                    const projPos = projectile.position;
+                    const distance = Math.sqrt(
+                        Math.pow(cubePos.x - projPos.x, 2) + 
+                        Math.pow(cubePos.z - projPos.z, 2)
+                    );
+                    
+                    if (distance < 0.8) {
+                        this.scene.remove(projectile);
+                        this.fireProjectiles.splice(i, 1);
+                        this.temperature += 3; // Fire damage increased to 3 degrees
+                    }
+                }
+                
+                // Check deflected projectiles hitting the boss
+                for (let i = this.fireProjectiles.length - 1; i >= 0; i--) {
+                    const projectile = this.fireProjectiles[i];
+                    if (!projectile.userData.deflected) continue;
+                    
+                    const projPos = projectile.position;
+                    const distance = Math.sqrt(
+                        Math.pow(bossPos.x - projPos.x, 2) + 
+                        Math.pow(bossPos.z - projPos.z, 2)
+                    );
+                    
+                    if (distance < 1.2) {
+                        this.scene.remove(projectile);
+                        this.fireProjectiles.splice(i, 1);
+                        this.hitBoss();
+                        break;
+                    }
+                }
+            }
+
+            swingBat() {
+                if (!this.iceBat || this.iceBat.userData.swinging) return;
+                
+                this.iceBat.userData.swinging = true;
+                this.iceBat.userData.swingStartTime = Date.now();
+                this.iceBat.userData.baseRotation = this.iceBat.rotation.y;
+            }
+
+            deflectProjectile(projectile) {
+                // Mark as deflected
+                projectile.userData.deflected = true;
+                
+                // Change color to show it's deflected
+                projectile.material.color.setHex(0x00aaff);
+                projectile.material.emissive.setHex(0x002244);
+                
+                // Calculate new velocity towards boss
+                const bossPos = this.fireBoss.position;
+                const dx = bossPos.x - projectile.position.x;
+                const dz = bossPos.z - projectile.position.z;
+                const distance = Math.sqrt(dx * dx + dz * dz);
+                
+                // New velocity towards boss
+                const time = distance / 4;
+                const newVelocityX = dx / time * 0.08;
+                const newVelocityZ = dz / time * 0.08;
+                const newVelocityY = 0.15;
+                
+                projectile.userData.velocity = new THREE.Vector3(newVelocityX, newVelocityY, newVelocityZ);
+            }
+
+            hitBoss() {
+                this.bossHealth--;
+                
+                // Boss hit effect
+                this.fireBoss.material.color.setHex(0xffff00);
+                setTimeout(() => {
+                    if (this.fireBoss) this.fireBoss.material.color.setHex(0xff4500);
+                }, 200);
+                
+                if (this.bossHealth <= 0) {
+                    this.defeatBoss();
+                }
+            }
+
+            defeatBoss() {
+                if (!this.fireBoss) return;
+                
+                // Vanish animation
+                const vanishAnimation = () => {
+                    this.fireBoss.scale.multiplyScalar(0.95);
+                    this.fireBoss.material.opacity -= 0.05;
+                    
+                    if (this.fireBoss.material.opacity > 0) {
+                        requestAnimationFrame(vanishAnimation);
+                    } else {
+                        this.scene.remove(this.fireBoss);
+                        this.fireBoss = null;
+                        this.bossActive = false;
+                        
+                        // Remove ice bat
+                        if (this.iceBat) {
+                            this.iceCubeGroup.remove(this.iceBat);
+                            this.iceBat = null;
+                        }
+                        
+                        // Clear fire projectiles
+                        this.fireProjectiles.forEach(proj => this.scene.remove(proj));
+                        this.fireProjectiles = [];
+                        
+                        // Start recovery period
+                        this.startRecoveryPeriod();
+                    }
+                };
+                vanishAnimation();
+            }
+
+            startRecoveryPeriod() {
+                this.recoveryMode = true;
+                this.recoveryTimer = 0;
+            }
+
+            updateMovement() {
+                if (!this.gameRunning) return;
+                
+                const speed = 0.1;
+                const bounds = 7;
+                
+                let moved = false;
+                let newX = this.iceCubeGroup.position.x;
+                let newZ = this.iceCubeGroup.position.z;
+                
+                if (this.keys['w'] || this.keys['ArrowUp']) {
+                    newZ = Math.max(this.iceCubeGroup.position.z - speed, -bounds);
+                }
+                if (this.keys['s'] || this.keys['ArrowDown']) {
+                    newZ = Math.min(this.iceCubeGroup.position.z + speed, bounds);
+                }
+                if (this.keys['a'] || this.keys['ArrowLeft']) {
+                    newX = Math.max(this.iceCubeGroup.position.x - speed, -bounds);
+                }
+                if (this.keys['d'] || this.keys['ArrowRight']) {
+                    newX = Math.min(this.iceCubeGroup.position.x + speed, bounds);
+                }
+                
+                // Check collision with fridge items before moving
+                let canMove = true;
+                for (const item of this.fridgeItems) {
+                    const bounds = item.bounds;
+                    const itemLeft = bounds.x - bounds.width / 2 - 0.5;
+                    const itemRight = bounds.x + bounds.width / 2 + 0.5;
+                    const itemTop = bounds.z - bounds.height / 2 - 0.5;
+                    const itemBottom = bounds.z + bounds.height / 2 + 0.5;
+                    
+                    if (newX >= itemLeft && newX <= itemRight && 
+                        newZ >= itemTop && newZ <= itemBottom) {
+                        canMove = false;
+                        break;
+                    }
+                }
+                
+                if (canMove) {
+                    if (newX !== this.iceCubeGroup.position.x || newZ !== this.iceCubeGroup.position.z) {
+                        this.iceCubeGroup.position.x = newX;
+                        this.iceCubeGroup.position.z = newZ;
+                        moved = true;
+                    }
+                }
+                
+                if (moved) {
+                    const slideAmount = Math.sin(Date.now() * 0.01) * 0.02;
+                    this.iceCube.position.y = slideAmount;
+                    
+                    const tiltAmount = 0.05;
+                    if (this.keys['w'] || this.keys['ArrowUp']) {
+                        this.iceCubeGroup.rotation.x = -tiltAmount;
+                    } else if (this.keys['s'] || this.keys['ArrowDown']) {
+                        this.iceCubeGroup.rotation.x = tiltAmount;
+                    } else {
+                        this.iceCubeGroup.rotation.x *= 0.9;
+                    }
+                    
+                    if (this.keys['a'] || this.keys['ArrowLeft']) {
+                        this.iceCubeGroup.rotation.z = tiltAmount;
+                    } else if (this.keys['d'] || this.keys['ArrowRight']) {
+                        this.iceCubeGroup.rotation.z = -tiltAmount;
+                    } else {
+                        this.iceCubeGroup.rotation.z *= 0.9;
+                    }
+                } else {
+                    this.iceCubeGroup.rotation.x *= 0.9;
+                    this.iceCubeGroup.rotation.z *= 0.9;
+                    this.iceCube.position.y *= 0.9;
+                }
+            }
+
+            updateUI() {
+                document.getElementById('holesFixed').textContent = this.holesFixed;
+                document.getElementById('activeHoles').textContent = this.holes.length;
+                document.getElementById('iceMakerIndicator').textContent = this.isUsingIceMaker ? 'COOLING' : 'Standby';
+                document.getElementById('iceMakerIndicator').style.color = this.isUsingIceMaker ? '#00ddff' : '#ffffff';
+                
+                // Boss battle UI
+                if (this.bossActive) {
+                    document.getElementById('bossStatus').style.display = 'block';
+                    document.getElementById('bossHealth').textContent = this.bossHealth;
+                } else if (this.recoveryMode) {
+                    document.getElementById('bossStatus').style.display = 'block';
+                    document.getElementById('bossHealth').textContent = 'Recovery: ' + Math.ceil((this.recoveryDuration - this.recoveryTimer) / 1000) + 's';
+                } else {
+                    document.getElementById('bossStatus').style.display = 'none';
+                }
+            }
+
+            gameOver() {
+                this.gameRunning = false;
+                document.getElementById('gameOver').style.display = 'block';
+            }
+
+            restart() {
+                this.gameRunning = true;
+                this.temperature = -10;
+                this.holesFixed = 0;
+                
+                // Find a safe spawn position for the ice cube
+                this.findSafeSpawnPosition();
+                
+                this.iceCubeGroup.rotation.set(0, 0, 0);
+                this.iceCube.position.set(0, 0, 0);
+                
+                this.holes.forEach(hole => this.scene.remove(hole));
+                this.holes = [];
+                
+                this.holeSpawnTimer = 0;
+                document.getElementById('gameOver').style.display = 'none';
+            }
+
+            findSafeSpawnPosition() {
+                // Try different spawn positions until we find one that doesn't collide
+                const possiblePositions = [
+                    { x: 0, z: 0 },      // Center
+                    { x: 2, z: 1 },      // Right center
+                    { x: -2, z: 1 },     // Left center
+                    { x: 0, z: 2 },      // Front center
+                    { x: 0, z: -2 },     // Back center
+                    { x: 3, z: 0 },      // Right
+                    { x: -3, z: 0 },     // Left
+                    { x: 1, z: 3 },      // Front right
+                    { x: -1, z: 3 }      // Front left
+                ];
+                
+                for (const pos of possiblePositions) {
+                    let canSpawn = true;
+                    
+                    // Check collision with all fridge items
+                    for (const item of this.fridgeItems) {
+                        const bounds = item.bounds;
+                        const itemLeft = bounds.x - bounds.width / 2 - 0.5;
+                        const itemRight = bounds.x + bounds.width / 2 + 0.5;
+                        const itemTop = bounds.z - bounds.height / 2 - 0.5;
+                        const itemBottom = bounds.z + bounds.height / 2 + 0.5;
+                        
+                        if (pos.x >= itemLeft && pos.x <= itemRight && 
+                            pos.z >= itemTop && pos.z <= itemBottom) {
+                            canSpawn = false;
+                            break;
+                        }
+                    }
+                    
+                    if (canSpawn) {
+                        this.iceCubeGroup.position.set(pos.x, 0.4, pos.z);
+                        return;
+                    }
+                }
+                
+                // Fallback to a guaranteed safe position if all else fails
+                this.iceCubeGroup.position.set(0, 0.4, 0);
+            }
+
+            setupEventListeners() {
+                window.addEventListener('keydown', (e) => {
+                    this.keys[e.key.toLowerCase()] = true;
+                    this.keys[e.key] = true; // For spacebar
+                    if (e.key.toLowerCase() === 'r' && !this.gameRunning) {
+                        this.restart();
+                    }
+                });
+                
+                window.addEventListener('keyup', (e) => {
+                    this.keys[e.key.toLowerCase()] = false;
+                    this.keys[e.key] = false; // For spacebar
+                });
+                
+                window.addEventListener('resize', () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight;
+                    this.camera.updateProjectionMatrix();
+                    this.renderer.setSize(window.innerWidth, window.innerHeight);
+                });
+            }
+
+            gameLoop() {
+                if (this.gameRunning && !this.recoveryMode) {
+                    if (this.bossActive) {
+                        this.updateBossBattle();
+                    } else {
+                        this.holeSpawnTimer += 16;
+                        if (this.holeSpawnTimer >= this.holeSpawnInterval) {
+                            this.spawnRandomHole();
+                            this.holeSpawnTimer = 0;
+                            this.holeSpawnInterval = Math.max(1500, this.holeSpawnInterval - 50);
+                        }
+                    }
+                    
+                    this.updateMovement();
+                    this.updateTemperature();
+                    this.checkCollisions();
+                    this.updateUI();
+                    
+                    if (!this.bossActive) {
+                        this.holes.forEach(hole => {
+                            const pulseIntensity = Math.sin(Date.now() * 0.005 + hole.userData.id) * 0.1 + 0.1;
+                            hole.material.opacity = 0.8 + pulseIntensity;
+                            
+                            const scaleVariation = Math.sin(Date.now() * 0.003 + hole.userData.id) * 0.05 + 1;
+                            hole.scale.set(scaleVariation, 1, scaleVariation);
+                        });
+                    }
+                } else if (this.recoveryMode) {
+                    this.recoveryTimer += 16;
+                    if (this.recoveryTimer >= this.recoveryDuration) {
+                        this.recoveryMode = false;
+                        this.recoveryTimer = 0;
+                    }
+                    this.updateMovement();
+                    this.updateTemperature();
+                    this.updateUI();
+                }
+                
+                this.renderer.render(this.scene, this.camera);
+                requestAnimationFrame(() => this.gameLoop());
+            }
+
+            updateBossBattle() {
+                if (!this.fireBoss) return;
+                
+                // Update ice bat swing animation
+                if (this.iceBat && this.iceBat.userData.swinging) {
+                    const elapsed = Date.now() - this.iceBat.userData.swingStartTime;
+                    const swingDuration = 300; // 300ms swing
+                    
+                    if (elapsed < swingDuration) {
+                        const progress = elapsed / swingDuration;
+                        const swingAngle = Math.sin(progress * Math.PI) * Math.PI / 3; // 60 degree swing
+                        this.iceBat.rotation.y = this.iceBat.userData.baseRotation + swingAngle;
+                    } else {
+                        // Return to base position
+                        this.iceBat.rotation.y = this.iceBat.userData.baseRotation;
+                        this.iceBat.userData.swinging = false;
+                    }
+                }
+                
+                // Animate boss flames
+                if (this.bossFlames) {
+                    this.bossFlames.forEach((flame, i) => {
+                        const angle = (i / 8) * Math.PI * 2 + Date.now() * 0.005;
+                        flame.position.set(
+                            Math.cos(angle) * 1.2,
+                            Math.sin(Date.now() * 0.01 + i) * 0.3,
+                            Math.sin(angle) * 1.2
+                        );
+                        flame.material.opacity = 0.6 + Math.sin(Date.now() * 0.01 + i) * 0.2;
+                    });
+                }
+                
+                // Boss movement
+                this.fireBoss.rotation.y += 0.02;
+                this.fireBoss.position.y += Math.sin(Date.now() * 0.003) * 0.01;
+                
+                // Fire projectiles at ice cube
+                this.bossFireTimer += 16;
+                if (this.bossFireTimer >= this.bossFireInterval) {
+                    this.createFireProjectile();
+                    this.bossFireTimer = 0;
+                }
+                
+                // Update fire projectiles with gravity
+                for (let i = this.fireProjectiles.length - 1; i >= 0; i--) {
+                    const projectile = this.fireProjectiles[i];
+                    const velocity = projectile.userData.velocity;
+                    
+                    // Apply gravity
+                    velocity.y -= 0.008; // Gravity acceleration
+                    
+                    // Update position
+                    projectile.position.add(velocity);
+                    
+                    // Remove projectiles that hit the ground or are out of bounds
+                    if (projectile.position.y <= 0.2 || 
+                        Math.abs(projectile.position.x) > 10 || 
+                        Math.abs(projectile.position.z) > 10) {
+                        this.scene.remove(projectile);
+                        this.fireProjectiles.splice(i, 1);
+                    }
+                }
+            }
+
+            createFireProjectile() {
+                if (!this.fireBoss) return;
+                
+                const projectileGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+                const projectileMaterial = new THREE.MeshPhongMaterial({ 
+                    color: 0xff4400,
+                    emissive: 0x440000
+                });
+                const projectile = new THREE.Mesh(projectileGeometry, projectileMaterial);
+                
+                projectile.position.copy(this.fireBoss.position);
+                
+                // Calculate parabolic trajectory towards ice cube
+                const cubePos = this.iceCubeGroup.position;
+                const dx = cubePos.x - this.fireBoss.position.x;
+                const dz = cubePos.z - this.fireBoss.position.z;
+                const distance = Math.sqrt(dx * dx + dz * dz);
+                
+                // Calculate initial velocity for parabolic trajectory
+                const time = distance / 3; // Approximate flight time
+                const initialVelocityX = dx / time * 0.05;
+                const initialVelocityZ = dz / time * 0.05;
+                const initialVelocityY = 0.12; // Initial upward velocity
+                
+                const velocity = new THREE.Vector3(initialVelocityX, initialVelocityY, initialVelocityZ);
+                projectile.userData.velocity = velocity;
+                
+                this.fireProjectiles.push(projectile);
+                this.scene.add(projectile);
+            }
+        }
+
+        new IceCubeGame();
+    </script>
 </body>
 </html>
