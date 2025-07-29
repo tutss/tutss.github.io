@@ -1,0 +1,44 @@
+<div id="toc" class="toc" style="display: none;">
+  <h2>Table of Contents</h2>
+  <ul id="toc-list"></ul>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const tocContainer = document.getElementById('toc');
+  const tocList = document.getElementById('toc-list');
+  const headers = document.querySelectorAll('.post-content h2, .post-content h3, .post-content h4, .post-content h5, .post-content h6');
+  
+  // Filter out headers that are inside the TOC
+  const filteredHeaders = Array.from(headers).filter(header => !header.closest('.toc'));
+  
+  if (filteredHeaders.length === 0) {
+    return; // Don't show TOC if no headers
+  }
+  
+  // Show the TOC container
+  tocContainer.style.display = 'block';
+  
+  filteredHeaders.forEach(function(header, index) {
+    // Create ID if it doesn't exist
+    if (!header.id) {
+      const text = header.textContent || header.innerText;
+      header.id = text.toLowerCase()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+    
+    // Create TOC entry
+    const li = document.createElement('li');
+    li.className = 'toc-' + header.tagName.toLowerCase();
+    
+    const a = document.createElement('a');
+    a.href = '#' + header.id;
+    a.textContent = header.textContent || header.innerText;
+    
+    li.appendChild(a);
+    tocList.appendChild(li);
+  });
+});
+</script>
