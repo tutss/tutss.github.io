@@ -35,5 +35,5 @@ gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
 
 gem "webrick", ">= 1.8.2"
 gem "rexml", ">= 3.3.9"
-gem "nokogiri", ">= 1.18.8"
+gem "nokogiri", ">= 1.18.9"
 gem "uri", ">= 0.13.2"
