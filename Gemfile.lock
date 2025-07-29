@@ -277,6 +277,7 @@ DEPENDENCIES
   github-pages (~> 231)
   http_parser.rb (~> 0.6.0)
   jekyll-feed (~> 0.12)
+  jekyll-seo-tag (~> 2.8)
   minima (~> 2.5)
   nokogiri (>= 1.18.8)
   rexml (>= 3.3.9)
