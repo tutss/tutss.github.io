@@ -24,9 +24,9 @@ author: Artur Magalhães
 description: >- # this means to ignore newlines until "baseurl:"
   Data Scientist at Amazon exploring the intersection of machine learning,
   curiosity, and life. Based in São Paulo, I write when inspiration strikes.
-domain: tutss.github.io
+domain: arturmagalhaes.com
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://tutss.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://arturmagalhaes.com" # the base hostname & protocol for your site, e.g. http://example.com
 timezone: America/Sao_Paulo
 # twitter_username: jekyllrb
 github_username:  tutss
