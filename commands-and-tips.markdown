@@ -6,6 +6,10 @@ permalink: /commands-and-tips/
 
 Dump of useful commands so that I don't forget them 
 
+### paper review prompt
+
+[paper-reviewer.md](/files/prompts/paper-reviewer.md).
+
 ### install conda env as kernel
 
 ```bash
