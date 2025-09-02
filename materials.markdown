@@ -4,8 +4,6 @@ title: Materials
 permalink: /materials/
 ---
 
-# Materials
-
 There's lots of content on machine learning out there and sometimes is hard to decide from which material to choose. The content here is what I usually share with others that ask for recommendations. The materials here are those that worked for me on my journey through AI. 
 
 ## Data Science, Stats and Machine Learning
