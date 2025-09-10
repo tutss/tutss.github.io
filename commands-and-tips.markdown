@@ -6,9 +6,23 @@ permalink: /commands-and-tips/
 
 Dump of useful commands so that I don't forget them 
 
+### img -> b64 and b64 -> img
+
+```python
+def image_to_b64(img, format="JPEG"):
+    buffer = BytesIO()
+    img.save(buffer, format=format)
+    return base64.b64encode(buffer.getvalue()).decode()
+
+
+def b64_to_image(b64_string):
+    img_data = base64.b64decode(b64_string)
+    return Image.open(BytesIO(img_data))
+```
+
 ### paper review prompt
 
-[paper-reviewer.md](/files/prompts/paper-reviewer.md).
+[paper-reviewer.md](/files/prompts/paper-reviewer.md)
 
 ### install conda env as kernel
 
