@@ -14,6 +14,7 @@ There's lots of content on machine learning out there and sometimes is hard to d
 |-------|-------|-------|
 | Machine Learning Q and AI | Sebastian Raschka | Great to review topics on recent ML (neural nets) |
 Machine Learning Engineering | Andriy Burkov | Overview how models reach production |
+| Super Study Guide: Transformers and Large Language Models | Afshine and Shervine Amidi | Awesome content on Transformers, specially for visual learners
 | The Hundred-Page Machine Learning Book | Andriy Burkov | Overview on ML topics
 | Hands-On Machine Learning | Aurélien Géron | Practical ML |
 | How to Lie with Statistics |  Darrell Huff | Classic on statistical thinking | 
@@ -43,9 +44,12 @@ Machine Learning Engineering | Andriy Burkov | Overview how models reach product
 
 | Name | Type | Author(s) | Notes | 
 |-------|-------|-------|-------|
+| Empire of AI | Book | Karen Hao | Impact of AI on a global scale |
 | Crucial Conversations | Book | Joseph Grenny and others | Tips on how to handle difficult conversations |
 | Freaknomics | Book | Steven Levitt and Stephen Dubner | If you are a curious person, this is a great book |
-| The Creative Act: A Way of Being | Book | Rick Rubin | Discussion on creatitive
+| The Phoenix Project | Book |  Gene Kim, Kevin Behr, George Spafford | Classic on tech companies organization
+| The Creative Act: A Way of Being | Book | Rick Rubin | Discussion on creativity |
+| Dracula | Book | Bram Stooker | My favorite book
 
 
 ---

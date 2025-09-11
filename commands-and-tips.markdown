@@ -6,6 +6,12 @@ permalink: /commands-and-tips/
 
 Dump of useful commands so that I don't forget them 
 
+### install package in specific version
+
+```bash
+pip install <package_name>==<version>
+```
+
 ### img -> b64 and b64 -> img
 
 ```python
