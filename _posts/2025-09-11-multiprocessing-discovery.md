@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "From one day to five minutes: a multiprocessing discovery"
+title: "From (almost) one day to five minutes: multiprocessing"
 date: 2025-09-11 22:59:00 -0300
 ---
 
