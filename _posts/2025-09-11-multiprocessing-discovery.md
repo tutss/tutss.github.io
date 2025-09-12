@@ -1,7 +1,9 @@
 ---
 layout: post
 title: "From (almost) one day to five minutes: multiprocessing"
-date: 2025-09-11 22:59:00 -0300
+date: 2025-09-11 23:07:14 -0300
+categories: [python, research, multiprocessing]
+tags: [data-science, parallel processing, multiprocessing]
 ---
 
 Last week, I started what seemed like a simple task: processing 100,000 samples from the [FaceCaption-15M dataset](https://huggingface.co/datasets/OpenFace-CQUPT/FaceCaption-15M) for my masters research. This dataset contains millions of face images with captions, perfect for training vision-language models. I wrote a straightforward script that would download images, crop faces based on provided bounding boxes, and save them for training. Then I hit run and waited.
