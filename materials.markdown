@@ -18,6 +18,9 @@ Machine Learning Engineering | Andriy Burkov | Overview how models reach product
 | The Hundred-Page Machine Learning Book | Andriy Burkov | Overview on ML topics
 | Hands-On Machine Learning | Aurélien Géron | Practical ML |
 | How to Lie with Statistics |  Darrell Huff | Classic on statistical thinking | 
+| Weapons of Math Destruction | Cathy O'Neil | How big data and algorithms can increase inequality |
+| The Chaos Machine | Max Fisher | Impact of social media on society |
+
 
 ### Courses
 
