@@ -6,6 +6,12 @@ permalink: /commands-and-tips/
 
 Dump of useful commands so that I don't forget them 
 
+### convert jupyter notebook into script
+
+```bash
+jupyter nbconvert --to script notebook.ipynb
+```
+
 ### install package in specific version
 
 ```bash
