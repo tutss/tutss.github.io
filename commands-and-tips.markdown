@@ -6,6 +6,14 @@ permalink: /commands-and-tips/
 
 Dump of useful commands so that I don't forget them 
 
+### what's the correct way to log hyperparameters in TensorBoard?
+
+Use `writer.add_hparams(hparams_dict, metrics_dict)` once per experiment after training completes, not continuously during training. Pass your hyperparameter configuration (learning rate, batch size, optimizer) and the final performance metrics (best accuracy, final loss) as separate dictionaries. This creates structured experiments in TensorBoard's HParams tab that let you compare different configurations and identify which hyperparameter combinations produce the best results.
+
+### why do I need to load optimizer and scheduler state when resuming PyTorch training, and what happens if I start fresh?
+
+Loading optimizer and scheduler state preserves essential training dynamics that accumulate over time. The optimizer state contains gradient statistics (moving averages in Adam, velocity in SGD) needed for stable parameter updates, while the scheduler state maintains your position in the learning rate schedule. Starting fresh forces the optimizer to rebuild these statistics from scratch and resets the learning rate to its initial value, creating a mismatch between your trained model parameters and the training dynamics. This typically causes loss spikes, training instability, and suboptimal convergence because the optimizer lacks historical gradient information for proper update scaling while using an inappropriate learning rate for the model's current convergence state.
+
 ### convert jupyter notebook into script
 
 ```bash
