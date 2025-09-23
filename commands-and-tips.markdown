@@ -40,10 +40,6 @@ def b64_to_image(b64_string):
     return Image.open(BytesIO(img_data))
 ```
 
-### paper review prompt
-
-[paper-reviewer.md](/files/prompts/paper-reviewer.md)
-
 ### install conda env as kernel
 
 ```bash
