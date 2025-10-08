@@ -22,7 +22,7 @@ title: tuts blog
 author: Artur Magalhães
 # email: artur_santos@alumni.usp.br
 description: >- # this means to ignore newlines until "baseurl:"
-  Data Scientist at Amazon exploring the intersection of machine learning,
+  Data Scientist at iFood exploring the intersection of machine learning,
   curiosity, and life. Based in São Paulo, I write when inspiration strikes.
 domain: arturmagalhaes.com
 baseurl: "" # the subpath of your site, e.g. /blog
