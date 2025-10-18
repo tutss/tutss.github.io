@@ -21,13 +21,22 @@ Machine Learning Engineering | Andriy Burkov | Overview how models reach product
 | Weapons of Math Destruction | Cathy O'Neil | How big data and algorithms can increase inequality |
 | The Chaos Machine | Max Fisher | Impact of social media on society |
 
-
 ### Courses
 
 | Name | Author(s) | Notes |
 | Stanford CS336 Language Modeling from Scratch | Percy Liang, Tatsunori Hashimoto | In-depth class about LLMs |
 | Stanford CS229 Machine Learning | Andrew Ng | Classic, theory + math |
 | Coursera Machine Learning Specialization | Andrew Ng | Most famous course on ML out there |
+
+## AI Engineering
+
+| Name | Author(s) |  Link |
+| Latent Space: The AI Engineer Podcast | - | https://www.latent.space/podcast |
+| AI Engineer YT channel | - | https://www.youtube.com/@aiDotEngineer |
+| AI Jason YT channel | Jason Zhou | https://www.youtube.com/@AIJasonZ |
+| Desigining Machine Learning Systems | Chip Huyen | https://www.amazon.com/Designing-Machine-Learning-Systems-Huyen-ebook/dp/B0B1LGL2SR |
+| AI Engineering book | Chip Huyen | https://www.amazon.com.br/AI-Engineering-Building-Applications-Foundation/dp/1098166302 |
+| Chip Huyen's blog | - | https://huyenchip.com/blog/ |
 
 ### Tutorials
 
