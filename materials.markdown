@@ -38,6 +38,8 @@ Machine Learning Engineering | Andriy Burkov | Overview how models reach product
 | AI Engineering book | Chip Huyen | https://www.amazon.com.br/AI-Engineering-Building-Applications-Foundation/dp/1098166302 |
 | Chip Huyen's blog | - | https://huyenchip.com/blog/ |
 
+> If you are starting, I would suggest taking a look at the posts on Chip's blog and the content on AI Engineer YT channel. If you want to dive deep, AI Engineering book. For designing ML systems in general - not only related to GenAI etc - I would definetely take a look at Desigining Machine Learning Systems. AI Jason YT channel has great content on agents usage, suggestions on how to use them properly, and cool ideas to develop. Latent Space is an awesome podcast that talks about this topic as well. 
+
 ### Tutorials
 
 | Name | Author(s) | Notes | Link
