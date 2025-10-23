@@ -6,8 +6,6 @@ categories: [research, python]
 tags: [data-science, deep-learning, pytorch, transformers, multimodal-learning]
 ---
 
-# Attention mechanisms: self-attention, cross-attention, and co-attention
-
 ## Introduction
 
 Attention mechanisms have become fundamental building blocks in modern deep learning, particularly for tasks involving multiple data modalities like text and images, or sequential data. However, the terminology can be confusing: what exactly is the difference between self-attention, cross-attention, and co-attention? When should you use each one?
