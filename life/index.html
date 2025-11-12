@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life calendar</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .controls {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input[type="number"], input[type="text"], input[type="color"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .activity-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .activity-inputs {
+            display: grid;
+            grid-template-columns: 1fr 80px 40px 32px;
+            gap: 8px;
+            align-items: end;
+        }
+        button {
+            padding: 10px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .btn-remove {
+            background: #dc3545;
+            padding: 8px;
+            width: 32px;
+            height: 32px;
+            font-size: 18px;
+            line-height: 1;
+        }
+        .btn-remove:hover {
+            background: #c82333;
+        }
+        .btn-add {
+            width: 100%;
+            margin-top: 10px;
+        }
+        canvas {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            max-width: 100%;
+        }
+        .stats {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .stats strong {
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Life calendar in months</h1>
+    
+    <div class="container">
+        <div class="controls">
+            <div class="input-group">
+                <label>Current Age (years)</label>
+                <input type="number" id="age" value="18" min="0" max="120">
+            </div>
+            
+            <div class="input-group">
+                <label>Life Expectancy (years)</label>
+                <input type="number" id="lifeExpectancy" value="90" min="0" max="120">
+            </div>
+            
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+            
+            <h3 style="margin-top: 0;">Activities (hours/day)</h3>
+            <div id="activities"></div>
+            <button class="btn-add" onclick="addActivity()">+ Add Activity</button>
+            
+            <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+            
+            <button onclick="generateChart()" style="width: 100%; padding: 12px; font-size: 16px;">
+                Generate Chart
+            </button>
+            
+            <div class="stats" id="stats"></div>
+        </div>
+        
+        <div>
+            <canvas id="lifeCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        const defaultActivities = [
+            { name: 'Sleep', hours: 8, color: '#9B8DB5' },
+            { name: 'Work', hours: 8, color: '#A8C5A0' },
+            { name: 'Eating', hours: 2, color: '#D89BA8' },
+            { name: 'Hygiene', hours: 1, color: '#85B5D4' }
+        ];
+
+        function initActivities() {
+            const container = document.getElementById('activities');
+            container.innerHTML = '';
+            defaultActivities.forEach((act, idx) => {
+                addActivityItem(act.name, act.hours, act.color, idx);
+            });
+        }
+
+        function addActivity() {
+            const container = document.getElementById('activities');
+            const idx = container.children.length;
+            addActivityItem('New Activity', 1, '#' + Math.floor(Math.random()*16777215).toString(16), idx);
+        }
+
+        function addActivityItem(name, hours, color, idx) {
+            const container = document.getElementById('activities');
+            const div = document.createElement('div');
+            div.className = 'activity-item';
+            div.innerHTML = `
+                <div class="activity-inputs">
+                    <input type="text" value="${name}" placeholder="Activity name" id="act-name-${idx}">
+                    <input type="number" value="${hours}" min="0" max="24" step="0.5" id="act-hours-${idx}">
+                    <input type="color" value="${color}" id="act-color-${idx}">
+                    <button class="btn-remove" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function getActivities() {
+            const container = document.getElementById('activities');
+            const activities = [];
+            Array.from(container.children).forEach((item, idx) => {
+                const name = document.getElementById(`act-name-${idx}`)?.value || '';
+                const hours = parseFloat(document.getElementById(`act-hours-${idx}`)?.value || 0);
+                const color = document.getElementById(`act-color-${idx}`)?.value || '#000000';
+                if (name && hours > 0) {
+                    activities.push({ name, hours, color });
+                }
+            });
+            return activities;
+        }
+
+        function generateChart() {
+            const age = parseInt(document.getElementById('age').value);
+            const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value);
+            const activities = getActivities();
+            
+            const remainingYears = lifeExpectancy - age;
+            const totalMonths = remainingYears * 12;
+            
+            const processedActivities = activities.map(act => ({
+                name: act.name,
+                months: (act.hours / 24) * totalMonths,
+                color: act.color
+            }));
+            
+            const totalAllocated = processedActivities.reduce((sum, act) => sum + act.months, 0);
+            const freeMonths = totalMonths - totalAllocated;
+            
+            drawChart(age, lifeExpectancy, totalMonths, processedActivities, freeMonths);
+            updateStats(totalMonths, processedActivities, freeMonths);
+        }
+
+        function drawChart(age, lifeExpectancy, totalMonths, activities, freeMonths) {
+            const canvas = document.getElementById('lifeCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const cols = 36;
+            const rows = Math.ceil(totalMonths / cols);
+            const circleRadius = 12;
+            const spacing = 28;
+            
+            canvas.width = cols * spacing + 40;
+            canvas.height = rows * spacing + 120;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`An ${age} year old's remaining time in months`, canvas.width / 2, 25);
+            
+            ctx.font = 'italic 12px sans-serif';
+            ctx.fillStyle = '#666';
+            ctx.fillText(`(Assuming ${lifeExpectancy} year life expectancy)`, canvas.width / 2, 45);
+            ctx.fillText(`1 row = ${cols} months = 3 years`, canvas.width / 2, 65);
+            
+            const activityCumsum = [0];
+            activities.forEach(act => {
+                activityCumsum.push(activityCumsum[activityCumsum.length - 1] + Math.floor(act.months));
+            });
+            
+            let monthCounter = 0;
+            for (let row = 0; row < rows; row++) {
+                for (let col = 0; col < cols; col++) {
+                    const x = col * spacing + 20;
+                    const y = row * spacing + 80;
+                    
+                    let color = 'white';
+                    let strokeColor = '#D0D0D0';
+                    
+                    if (monthCounter < totalMonths) {
+                        for (let i = 0; i < activities.length; i++) {
+                            if (monthCounter >= activityCumsum[i] && monthCounter < activityCumsum[i + 1]) {
+                                color = activities[i].color;
+                                strokeColor = activities[i].color;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, circleRadius, 0, 2 * Math.PI);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    
+                    monthCounter++;
+                }
+            }
+        }
+
+        function updateStats(totalMonths, activities, freeMonths) {
+            const statsDiv = document.getElementById('stats');
+            let html = `<strong>Total months:</strong> ${totalMonths}<br><br>`;
+            
+            activities.forEach(act => {
+                html += `<strong>${act.name}:</strong> ${Math.floor(act.months)} months (${(act.months / 12).toFixed(1)} years)<br>`;
+            });
+            
+            html += `<br><strong>Free time:</strong> ${Math.floor(freeMonths)} months (${(freeMonths / 12).toFixed(1)} years)`;
+            statsDiv.innerHTML = html;
+        }
+
+        initActivities();
+        generateChart();
+    </script>
+</body>
+</html>
