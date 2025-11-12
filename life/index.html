@@ -21,6 +21,29 @@
             margin-bottom: 20px;
             line-height: 1.5;
         }
+        .language-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            font-size: 14px;
+        }
+        .lang-option {
+            padding: 6px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            color: #666;
+        }
+        .lang-option:hover {
+            background: #f0f0f0;
+        }
+        .lang-option.active {
+            background: #007bff;
+            color: white;
+            font-weight: 500;
+        }
         .container {
             display: grid;
             grid-template-columns: 300px 1fr;
@@ -34,6 +57,14 @@
             .container {
                 grid-template-columns: 1fr;
                 gap: 20px;
+            }
+            .language-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 12px;
+            }
+            .lang-option {
+                padding: 4px 8px;
             }
         }
         .controls {
@@ -135,11 +166,16 @@
     </style>
 </head>
 <body>
-    <h1>Life calendar in months</h1>
+    <div class="language-toggle">
+        <span class="lang-option active" data-lang="en">EN</span>
+        <span class="lang-option" data-lang="pt-br">PT-BR</span>
+    </div>
+
+    <h1 id="pageTitle">Life calendar in months</h1>
     <p class="subtitle">
-        Visualize your remaining time by activity. Hover over circles (or tap on mobile) to see details. Customize activities and hours in the panel to see how you'll spend your time.<br>
-        <span style="font-size:13px; color:#666;">
-            Inspired by <a href="https://www.youtube.com/watch?v=4TMPXK9tw5U" target="_blank" rel="noopener">The Battle for Your Time: Exposing the Costs of Social Media | Dino Ambrosi | TEDxLagunaBlancaSchool</a>.
+        <span id="subtitleText">Visualize your remaining time by activity. Hover over circles (or tap on mobile) to see details. Customize activities and hours in the panel to see how you'll spend your time.</span><br>
+        <span style="font-size:10px; color:#666;">
+            <span id="inspiredBy">Inspired by</span> <a href="https://www.youtube.com/watch?v=4TMPXK9tw5U" target="_blank" rel="noopener">The Battle for Your Time: Exposing the Costs of Social Media | Dino Ambrosi | TEDxLagunaBlancaSchool</a>.
         </span>
     </p>
 
@@ -148,24 +184,24 @@
     <div class="container">
         <div class="controls">
             <div class="input-group">
-                <label>Current Age (years)</label>
+                <label id="labelCurrentAge">Current Age (years)</label>
                 <input type="number" id="age" value="18" min="0" max="120">
             </div>
-            
+
             <div class="input-group">
-                <label>Life Expectancy (years)</label>
+                <label id="labelLifeExpectancy">Life Expectancy (years)</label>
                 <input type="number" id="lifeExpectancy" value="90" min="0" max="120">
             </div>
-            
+
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-            
-            <h3 style="margin-top: 0;">Activities (hours/day)</h3>
+
+            <h3 style="margin-top: 0;" id="activitiesTitle">Activities (hours/day)</h3>
             <div id="activities"></div>
-            <button class="btn-add" onclick="addActivity()">+ Add</button>
-            
+            <button class="btn-add" id="addButton" onclick="addActivity()">+ Add</button>
+
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-            
-            <button onclick="generateChart()" style="width: 100%; padding: 12px; font-size: 16px;">
+
+            <button id="generateButton" onclick="generateChart()" style="width: 100%; padding: 12px; font-size: 16px;">
                 Generate
             </button>
             
@@ -178,6 +214,61 @@
     </div>
 
     <script>
+        let currentLanguage = 'en';
+
+        const translations = {
+            en: {
+                pageTitle: 'Life calendar in months',
+                subtitle: 'Visualize your remaining time by activity. Hover over circles (or tap on mobile) to see details. Customize activities and hours in the panel to see how you\'ll spend your time.',
+                inspiredBy: 'Inspired by',
+                currentAge: 'Current Age (years)',
+                lifeExpectancy: 'Life Expectancy (years)',
+                activitiesTitle: 'Activities (hours/day)',
+                generateButton: 'Generate',
+                addButton: '+ Add',
+                totalMonths: 'Total months',
+                freeTime: 'Free time',
+                months: 'months',
+                years: 'years',
+                chartTitle: 'year old\'s remaining time in months',
+                chartSubtitle: 'Assuming',
+                yearLifeExpectancy: 'year life expectancy',
+                rowInfo: 'row =',
+                an: 'An',
+                defaultActivities: {
+                    sleep: 'Sleep',
+                    work: 'Work',
+                    eating: 'Eating',
+                    hygiene: 'Hygiene'
+                }
+            },
+            'pt-br': {
+                pageTitle: 'Calendário de vida em meses',
+                subtitle: 'Visualize seu tempo restante por atividade. Passe o mouse sobre os círculos (ou toque no celular) para ver detalhes. Personalize atividades e horas no painel para ver como você gastará seu tempo.',
+                inspiredBy: 'Inspirado por',
+                currentAge: 'Idade Atual (anos)',
+                lifeExpectancy: 'Expectativa de Vida (anos)',
+                activitiesTitle: 'Atividades (horas/dia)',
+                generateButton: 'Gerar',
+                addButton: '+ Adicionar',
+                totalMonths: 'Total de meses',
+                freeTime: 'Tempo livre',
+                months: 'meses',
+                years: 'anos',
+                chartTitle: 'anos de tempo restante em meses',
+                chartSubtitle: 'Considerando',
+                yearLifeExpectancy: 'anos de expectativa de vida',
+                rowInfo: 'linha =',
+                an: 'Aos',
+                defaultActivities: {
+                    sleep: 'Dormir',
+                    work: 'Trabalhar',
+                    eating: 'Comer',
+                    hygiene: 'Higiene'
+                }
+            }
+        };
+
         const defaultActivities = [
             { name: 'Sleep', hours: 8, color: '#9B8DB5' },
             { name: 'Work', hours: 8, color: '#A8C5A0' },
@@ -292,16 +383,18 @@
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            const t = translations[currentLanguage];
+
             ctx.fillStyle = '#333';
             ctx.font = `bold ${titleFontSize}px sans-serif`;
             ctx.textAlign = 'center';
-            ctx.fillText(`An ${age} year old's remaining time in months`, canvas.width / 2, 25);
+            ctx.fillText(`${t.an} ${age} ${t.chartTitle}`, canvas.width / 2, 25);
 
             ctx.font = `italic ${subtitleFontSize}px sans-serif`;
             ctx.fillStyle = '#666';
-            ctx.fillText(`(Assuming ${lifeExpectancy} year life expectancy)`, canvas.width / 2, 45);
+            ctx.fillText(`(${t.chartSubtitle} ${lifeExpectancy} ${t.yearLifeExpectancy})`, canvas.width / 2, 45);
             const yearsPerRow = (cols / 12).toFixed(1);
-            ctx.fillText(`1 row = ${cols} months = ${yearsPerRow} years`, canvas.width / 2, 65);
+            ctx.fillText(`1 ${t.rowInfo} ${cols} ${t.months} = ${yearsPerRow} ${t.years}`, canvas.width / 2, 65);
             
             const activityCumsum = [0];
             activities.forEach(act => {
@@ -351,14 +444,35 @@
 
         function updateStats(totalMonths, activities, freeMonths) {
             const statsDiv = document.getElementById('stats');
-            let html = `<strong>Total months:</strong> ${totalMonths}<br><br>`;
+            const t = translations[currentLanguage];
+            let html = `<strong>${t.totalMonths}:</strong> ${totalMonths}<br><br>`;
 
             activities.forEach(act => {
-                html += `<strong>${act.name}:</strong> ${Math.floor(act.months)} months (${(act.months / 12).toFixed(1)} years)<br>`;
+                html += `<strong>${act.name}:</strong> ${Math.floor(act.months)} ${t.months} (${(act.months / 12).toFixed(1)} ${t.years})<br>`;
             });
 
-            html += `<br><strong>Free time:</strong> ${Math.floor(freeMonths)} months (${(freeMonths / 12).toFixed(1)} years)`;
+            html += `<br><strong>${t.freeTime}:</strong> ${Math.floor(freeMonths)} ${t.months} (${(freeMonths / 12).toFixed(1)} ${t.years})`;
             statsDiv.innerHTML = html;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            const t = translations[lang];
+
+            document.getElementById('pageTitle').textContent = t.pageTitle;
+            document.getElementById('subtitleText').textContent = t.subtitle;
+            document.getElementById('inspiredBy').textContent = t.inspiredBy;
+            document.getElementById('labelCurrentAge').textContent = t.currentAge;
+            document.getElementById('labelLifeExpectancy').textContent = t.lifeExpectancy;
+            document.getElementById('activitiesTitle').textContent = t.activitiesTitle;
+            document.getElementById('addButton').textContent = t.addButton;
+            document.getElementById('generateButton').textContent = t.generateButton;
+
+            document.querySelectorAll('.lang-option').forEach(option => {
+                option.classList.toggle('active', option.dataset.lang === lang);
+            });
+
+            generateChart();
         }
 
         function getCircleAtPosition(mouseX, mouseY) {
@@ -385,9 +499,10 @@
             if (!activity) return;
 
             const tooltip = document.getElementById('tooltip');
+            const t = translations[currentLanguage];
             const months = Math.floor(activity.months);
             const years = (activity.months / 12).toFixed(1);
-            tooltip.innerHTML = `${activity.name}: ${months} months (${years} years)`;
+            tooltip.innerHTML = `${activity.name}: ${months} ${t.months} (${years} ${t.years})`;
             tooltip.style.display = 'block';
             tooltip.style.left = (mouseX + 15) + 'px';
             tooltip.style.top = (mouseY + 15) + 'px';
@@ -434,6 +549,13 @@
             } else {
                 hideTooltip();
             }
+        });
+
+        document.querySelectorAll('.lang-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                const lang = e.target.dataset.lang;
+                setLanguage(lang);
+            });
         });
     </script>
 </body>
