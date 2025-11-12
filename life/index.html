@@ -136,7 +136,8 @@
 </head>
 <body>
     <h1>Life calendar in months</h1>
-    
+    <p class="subtitle">Visualize your remaining time by activity. Hover over circles (or tap on mobile) to see details. Customize activities and hours in the panel to see how you'll spend your time.</p>
+
     <div id="tooltip" style="display: none;"></div>
 
     <div class="container">
@@ -155,12 +156,12 @@
             
             <h3 style="margin-top: 0;">Activities (hours/day)</h3>
             <div id="activities"></div>
-            <button class="btn-add" onclick="addActivity()">+ Add Activity</button>
+            <button class="btn-add" onclick="addActivity()">+ Add</button>
             
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
             
             <button onclick="generateChart()" style="width: 100%; padding: 12px; font-size: 16px;">
-                Generate Chart
+                Generate
             </button>
             
             <div class="stats" id="stats"></div>
