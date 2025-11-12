@@ -11,6 +11,16 @@
             margin: 0 auto;
             padding: 20px;
         }
+        h1 {
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
         .container {
             display: grid;
             grid-template-columns: 300px 1fr;
@@ -97,6 +107,8 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             max-width: 100%;
+            display: block;
+            margin: 0 auto;
         }
         .stats {
             margin-top: 15px;
@@ -108,11 +120,25 @@
         .stats strong {
             color: #1976d2;
         }
+        #tooltip {
+            position: fixed;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            pointer-events: none;
+            z-index: 1000;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
     <h1>Life calendar in months</h1>
     
+    <div id="tooltip" style="display: none;"></div>
+
     <div class="container">
         <div class="controls">
             <div class="input-group">
@@ -152,6 +178,8 @@
             { name: 'Eating', hours: 2, color: '#D89BA8' },
             { name: 'Hygiene', hours: 1, color: '#85B5D4' }
         ];
+
+        let circleData = [];
 
         function initActivities() {
             const container = document.getElementById('activities');
@@ -252,6 +280,9 @@
             canvas.width = cols * spacing + 40;
             canvas.height = rows * spacing + headerHeight;
 
+            circleData = [];
+            circleData.radius = circleRadius;
+
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -277,20 +308,22 @@
                 for (let col = 0; col < cols; col++) {
                     const x = col * spacing + 20;
                     const y = row * spacing + topMargin;
-                    
+
                     let color = 'white';
                     let strokeColor = '#D0D0D0';
-                    
+                    let currentActivity = null;
+
                     if (monthCounter < totalMonths) {
                         for (let i = 0; i < activities.length; i++) {
                             if (monthCounter >= activityCumsum[i] && monthCounter < activityCumsum[i + 1]) {
                                 color = activities[i].color;
                                 strokeColor = activities[i].color;
+                                currentActivity = activities[i];
                                 break;
                             }
                         }
                     }
-                    
+
                     ctx.beginPath();
                     ctx.arc(x, y, circleRadius, 0, 2 * Math.PI);
                     ctx.fillStyle = color;
@@ -298,7 +331,13 @@
                     ctx.strokeStyle = strokeColor;
                     ctx.lineWidth = 1;
                     ctx.stroke();
-                    
+
+                    circleData.push({
+                        x: x,
+                        y: y,
+                        activity: currentActivity
+                    });
+
                     monthCounter++;
                 }
             }
@@ -307,13 +346,50 @@
         function updateStats(totalMonths, activities, freeMonths) {
             const statsDiv = document.getElementById('stats');
             let html = `<strong>Total months:</strong> ${totalMonths}<br><br>`;
-            
+
             activities.forEach(act => {
                 html += `<strong>${act.name}:</strong> ${Math.floor(act.months)} months (${(act.months / 12).toFixed(1)} years)<br>`;
             });
-            
+
             html += `<br><strong>Free time:</strong> ${Math.floor(freeMonths)} months (${(freeMonths / 12).toFixed(1)} years)`;
             statsDiv.innerHTML = html;
+        }
+
+        function getCircleAtPosition(mouseX, mouseY) {
+            const canvas = document.getElementById('lifeCanvas');
+            const rect = canvas.getBoundingClientRect();
+
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            const x = (mouseX - rect.left) * scaleX;
+            const y = (mouseY - rect.top) * scaleY;
+
+            for (let i = 0; i < circleData.length; i++) {
+                const circle = circleData[i];
+                const distance = Math.sqrt((x - circle.x) ** 2 + (y - circle.y) ** 2);
+                if (distance <= circleData.radius) {
+                    return circle.activity;
+                }
+            }
+            return null;
+        }
+
+        function showTooltip(activity, mouseX, mouseY) {
+            if (!activity) return;
+
+            const tooltip = document.getElementById('tooltip');
+            const months = Math.floor(activity.months);
+            const years = (activity.months / 12).toFixed(1);
+            tooltip.innerHTML = `${activity.name}: ${months} months (${years} years)`;
+            tooltip.style.display = 'block';
+            tooltip.style.left = (mouseX + 15) + 'px';
+            tooltip.style.top = (mouseY + 15) + 'px';
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.display = 'none';
         }
 
         initActivities();
@@ -325,6 +401,33 @@
             resizeTimeout = setTimeout(() => {
                 generateChart();
             }, 250);
+        });
+
+        const canvas = document.getElementById('lifeCanvas');
+
+        canvas.addEventListener('mousemove', (e) => {
+            const activity = getCircleAtPosition(e.clientX, e.clientY);
+            if (activity) {
+                showTooltip(activity, e.clientX, e.clientY);
+                canvas.style.cursor = 'pointer';
+            } else {
+                hideTooltip();
+                canvas.style.cursor = 'default';
+            }
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            hideTooltip();
+            canvas.style.cursor = 'default';
+        });
+
+        canvas.addEventListener('click', (e) => {
+            const activity = getCircleAtPosition(e.clientX, e.clientY);
+            if (activity) {
+                showTooltip(activity, e.clientX, e.clientY);
+            } else {
+                hideTooltip();
+            }
         });
     </script>
 </body>
