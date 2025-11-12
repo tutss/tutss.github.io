@@ -17,6 +17,15 @@
             gap: 30px;
             margin-top: 20px;
         }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
         .controls {
             background: #f5f5f5;
             padding: 20px;
@@ -50,6 +59,12 @@
             grid-template-columns: 1fr 80px 40px 32px;
             gap: 8px;
             align-items: end;
+        }
+        @media (max-width: 480px) {
+            .activity-inputs {
+                grid-template-columns: 1fr 60px 36px 32px;
+                gap: 4px;
+            }
         }
         button {
             padding: 10px 16px;
@@ -205,27 +220,51 @@
         function drawChart(age, lifeExpectancy, totalMonths, activities, freeMonths) {
             const canvas = document.getElementById('lifeCanvas');
             const ctx = canvas.getContext('2d');
-            
-            const cols = 36;
+
+            const isMobile = window.innerWidth <= 768;
+            const isSmallMobile = window.innerWidth <= 480;
+
+            let cols = 36;
+            let circleRadius = 12;
+            let spacing = 28;
+            let headerHeight = 120;
+            let titleFontSize = 18;
+            let subtitleFontSize = 12;
+
+            if (isSmallMobile) {
+                cols = 12;
+                circleRadius = 8;
+                spacing = 20;
+                headerHeight = 100;
+                titleFontSize = 14;
+                subtitleFontSize = 10;
+            } else if (isMobile) {
+                cols = 18;
+                circleRadius = 10;
+                spacing = 24;
+                headerHeight = 110;
+                titleFontSize = 16;
+                subtitleFontSize = 11;
+            }
+
             const rows = Math.ceil(totalMonths / cols);
-            const circleRadius = 12;
-            const spacing = 28;
-            
+
             canvas.width = cols * spacing + 40;
-            canvas.height = rows * spacing + 120;
-            
+            canvas.height = rows * spacing + headerHeight;
+
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
+
             ctx.fillStyle = '#333';
-            ctx.font = 'bold 18px sans-serif';
+            ctx.font = `bold ${titleFontSize}px sans-serif`;
             ctx.textAlign = 'center';
             ctx.fillText(`An ${age} year old's remaining time in months`, canvas.width / 2, 25);
-            
-            ctx.font = 'italic 12px sans-serif';
+
+            ctx.font = `italic ${subtitleFontSize}px sans-serif`;
             ctx.fillStyle = '#666';
             ctx.fillText(`(Assuming ${lifeExpectancy} year life expectancy)`, canvas.width / 2, 45);
-            ctx.fillText(`1 row = ${cols} months = 3 years`, canvas.width / 2, 65);
+            const yearsPerRow = (cols / 12).toFixed(1);
+            ctx.fillText(`1 row = ${cols} months = ${yearsPerRow} years`, canvas.width / 2, 65);
             
             const activityCumsum = [0];
             activities.forEach(act => {
@@ -233,10 +272,11 @@
             });
             
             let monthCounter = 0;
+            const topMargin = headerHeight - 20;
             for (let row = 0; row < rows; row++) {
                 for (let col = 0; col < cols; col++) {
                     const x = col * spacing + 20;
-                    const y = row * spacing + 80;
+                    const y = row * spacing + topMargin;
                     
                     let color = 'white';
                     let strokeColor = '#D0D0D0';
@@ -278,6 +318,14 @@
 
         initActivities();
         generateChart();
+
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                generateChart();
+            }, 250);
+        });
     </script>
 </body>
 </html>
