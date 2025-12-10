@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive retrieval metrics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #f5f7fa;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #fafbfc;
+
+      --text-primary: #1d1d1f;
+      --text-secondary: #6e6e73;
+      --text-tertiary: #86868b;
+
+      --accent-blue: #007aff;
+      --accent-blue-light: #5ac8fa;
+      --accent-green: #34c759;
+      --accent-green-light: #30d158;
+      --accent-pink: #ff2d55;
+      --accent-pink-light: #ff375f;
+      --accent-orange: #ff9500;
+      --accent-orange-light: #ffb340;
+
+      --border-light: rgba(0, 0, 0, 0.06);
+      --border-medium: rgba(0, 0, 0, 0.1);
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+      --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.05);
+      --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 24px;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      color: var(--accent-blue);
+    }
+
+    .subtitle {
+      font-size: 17px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow-sm);
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: none;
+      background: transparent;
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+    }
+
+    .tab.active {
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    .card {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--border-light);
+      backdrop-filter: blur(20px);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .instructions {
+      background: rgba(0, 122, 255, 0.08);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      border: 1px solid rgba(0, 122, 255, 0.15);
+    }
+
+    .instructions strong {
+      color: var(--accent-blue);
+      font-weight: 600;
+    }
+
+    .metric-definition {
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      font-size: 15px;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-light);
+      line-height: 1.7;
+    }
+
+    .metric-definition h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .metric-definition p {
+      margin-bottom: 12px;
+    }
+
+    .metric-definition p:last-child {
+      margin-bottom: 0;
+    }
+
+    .metric-definition strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .query-selector {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .query-selector label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 15px;
+    }
+
+    .query-selector select {
+      padding: 8px 16px;
+      border-radius: 8px;
+      border: 2px solid var(--border-medium);
+      background: white;
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Crimson Pro', Georgia, serif;
+    }
+
+    .query-selector select:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .query-selector select:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    .query-gallery {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .query-box {
+      flex: 0 0 180px;
+    }
+
+    .query-item {
+      background: var(--accent-blue);
+      color: white;
+      padding: 48px 20px;
+      text-align: center;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 15px;
+      box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .query-item::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .query-item:hover::before {
+      opacity: 1;
+    }
+
+    .gallery {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .gallery-item {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      text-align: center;
+      padding: 8px;
+      line-height: 1.3;
+      border: 2px solid transparent;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-2px) scale(1.02);
+    }
+
+    .gallery-item.relevant {
+      background: rgba(52, 199, 89, 0.1);
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+    }
+
+    .gallery-item.non-relevant {
+      background: rgba(255, 45, 85, 0.1);
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+    }
+
+    .legend {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      font-size: 13px;
+      margin-top: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+    }
+
+    .legend-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 2px solid;
+    }
+
+    .legend-box.relevant {
+      background: rgba(52, 199, 89, 0.1);
+      border-color: var(--accent-green);
+    }
+
+    .legend-box.non-relevant {
+      background: rgba(255, 45, 85, 0.1);
+      border-color: var(--accent-pink);
+    }
+
+    .legend-box.topk {
+      background: rgba(255, 149, 0, 0.1);
+      border-color: var(--accent-orange);
+    }
+
+    .ranked-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: nowrap;
+      background: var(--bg-tertiary);
+      padding: 24px;
+      border-radius: 12px;
+      min-height: 130px;
+      overflow-x: auto;
+      border: 1px solid var(--border-light);
+      margin-bottom: 20px;
+    }
+
+    .ranked-item {
+      flex: 0 0 95px;
+      width: 95px;
+      height: 95px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      cursor: move;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      background: white;
+      border: 2px solid var(--border-light);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .ranked-item:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .ranked-item.dragging {
+      opacity: 0.5;
+      transform: scale(1.05);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .ranked-item.relevant {
+      border-color: var(--accent-green);
+      background: rgba(52, 199, 89, 0.05);
+    }
+
+    .ranked-item.non-relevant {
+      border-color: var(--accent-pink);
+      background: rgba(255, 45, 85, 0.05);
+    }
+
+    .ranked-item.in-topk {
+      border-color: var(--accent-orange);
+      box-shadow: 0 0 0 3px rgba(255, 149, 0, 0.1);
+    }
+
+    .ranked-item.in-topk::after {
+      content: '✓';
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--accent-orange);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: var(--shadow-md);
+    }
+
+    .ranked-item .rank-num {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      background: var(--accent-blue);
+      color: white;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      box-shadow: var(--shadow-md);
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    .ranked-item .identity {
+      font-size: 10px;
+      font-weight: 600;
+      margin-top: 6px;
+      text-align: center;
+      line-height: 1.3;
+      padding: 0 4px;
+      color: var(--text-primary);
+    }
+
+    .ranked-item .score {
+      font-size: 9px;
+      margin-top: 3px;
+      color: var(--text-tertiary);
+      font-family: 'Source Code Pro', monospace;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: none;
+      background: var(--accent-blue);
+      color: white;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: var(--bg-secondary);
+      color: var(--accent-blue);
+      border: 2px solid var(--accent-blue);
+      box-shadow: none;
+    }
+
+    button.secondary:hover {
+      background: rgba(0, 122, 255, 0.05);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .precision-table {
+      background: var(--bg-tertiary);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+    }
+
+    .precision-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .precision-table th {
+      background: var(--accent-blue);
+      color: white;
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .precision-table th:first-child {
+      border-radius: 8px 0 0 0;
+    }
+
+    .precision-table th:last-child {
+      border-radius: 0 8px 0 0;
+    }
+
+    .precision-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border-light);
+      font-size: 13px;
+      background: white;
+      color: var(--text-secondary);
+    }
+
+    .precision-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .precision-table tr.highlight td {
+      background: rgba(52, 199, 89, 0.08);
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .ap-calc {
+      background: rgba(52, 199, 89, 0.1);
+      padding: 24px;
+      border-radius: 12px;
+      border: 2px solid rgba(52, 199, 89, 0.2);
+      text-align: center;
+    }
+
+    .ap-calc h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+    }
+
+    .ap-value {
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--accent-green);
+      margin: 16px 0;
+      letter-spacing: -0.02em;
+      animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.9);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .formula {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 12px 0;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border: 1px solid var(--border-light);
+    }
+
+    .ap-note {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 12px;
+    }
+
+    .k-selector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: var(--bg-tertiary);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-light);
+    }
+
+    .k-selector-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 15px;
+      min-width: 80px;
+    }
+
+    .k-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .k-button {
+      background: white;
+      color: var(--text-secondary);
+      border: 2px solid var(--border-medium);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Source Code Pro', monospace;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .k-button:hover {
+      border-color: var(--accent-orange);
+      color: var(--accent-orange);
+      transform: translateY(-1px);
+    }
+
+    .k-button.active {
+      background: var(--accent-orange);
+      color: white;
+      border-color: var(--accent-orange);
+      box-shadow: 0 2px 8px rgba(255, 149, 0, 0.25);
+    }
+
+    .topk-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .stat-card {
+      background: var(--bg-tertiary);
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-value.correct {
+      color: var(--accent-green);
+    }
+
+    .stat-value.incorrect {
+      color: var(--accent-pink);
+    }
+
+    .accuracy-chart {
+      background: var(--bg-tertiary);
+      padding: 24px;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+    }
+
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+    }
+
+    .chart-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chart-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .chart-bar-label {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 50px;
+    }
+
+    .chart-bar-container {
+      flex: 1;
+      height: 28px;
+      background: white;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border-light);
+    }
+
+    .chart-bar-fill {
+      height: 100%;
+      background: var(--accent-orange);
+      border-radius: 8px;
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .chart-bar-value {
+      font-family: 'Source Code Pro', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      min-width: 60px;
+      text-align: right;
+    }
+
+    @media (max-width: 1024px) {
+      .metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .topk-stats {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 36px;
+      }
+
+      .query-gallery {
+        flex-direction: column;
+      }
+
+      .query-box {
+        flex: 1;
+        width: 100%;
+      }
+
+      .gallery {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      .tabs {
+        flex-direction: column;
+      }
+
+      .k-selector {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .card {
+        padding: 20px;
+      }
+
+      .topk-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-medium);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-tertiary);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Interactive retrieval metrics</h1>
+      <div class="subtitle">Explore how different metrics evaluate face recognition performance</div>
+    </header>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('map')">Mean average precision</div>
+      <div class="tab" onclick="switchTab('topk')">Top-k accuracy</div>
+    </div>
+
+    <div id="mapTab" class="tab-content active">
+      <div class="instructions">
+        <strong>Instructions:</strong> Select a person to query from the dropdown. Drag items in the ranked list to
+        reorder them. Items marked in green are images of the selected query person (relevant to the query). Watch how
+        the average precision metric changes based on the ranking order.
+      </div>
+
+      <div class="metric-definition">
+        <h3>What is mean average precision?</h3>
+        <p>Mean Average Precision (mAP) measures how well a model ranks relevant items at the top of the results list.
+          Unlike binary classification metrics, mAP heavily penalizes when correct matches are ranked low.</p>
+        <p>For each query, <strong>Average Precision (AP)</strong> is calculated by averaging the precision values at
+          each position where a relevant item appears. The <strong>mean</strong> in mAP is simply the average AP across
+          all queries.</p>
+        <p>mAP is particularly well-suited for face re-identification because it is <strong>rank-aware</strong> (a
+          correct match at rank 1 contributes much more than at rank 10), handles class imbalance naturally, and
+          directly aligns with the task of ranking gallery images to find correct matches first.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Query vs gallery</div>
+        <div class="query-selector">
+          <label for="queryPersonSelect">Select query person:</label>
+          <select id="queryPersonSelect" onchange="changeQueryPerson(this.value)">
+            <option value="João Silva">João Silva</option>
+            <option value="Maria Santos">Maria Santos</option>
+          </select>
+        </div>
+        <div class="query-gallery">
+          <div class="query-box">
+            <div class="query-item" id="queryPersonDisplay">Query<br>João Silva</div>
+          </div>
+          <div class="gallery" id="gallery"></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-box relevant"></div>
+            <span>Relevant (<span id="relevantLabel">João Silva</span>)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-box non-relevant"></div>
+            <span>Non-relevant (Other persons)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Ranked list</div>
+        <div class="ranked-list" id="rankedList"></div>
+        <div class="buttons">
+          <button onclick="resetRanking()">Reset to original</button>
+          <button class="secondary" onclick="randomizeRanking()">Randomize</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Precision calculation & average precision</div>
+        <div class="metrics">
+          <div class="precision-table">
+            <table id="precisionTable">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Identity</th>
+                  <th>Relevant?</th>
+                  <th>Precision@k</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="ap-calc">
+            <h3>Average precision</h3>
+            <div id="apFormula" class="formula"></div>
+            <div class="ap-value" id="apValue">0.000</div>
+            <div class="ap-note">
+              Higher is better — Perfect score = 1.000
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="topkTab" class="tab-content">
+      <div class="instructions">
+        <strong>Instructions:</strong> Select a person to query from the dropdown (same as mAP tab). Select different
+        values of k to see which items fall within the top-k results. Drag items in the ranked list to observe how
+        different rankings affect the metrics.
+      </div>
+
+      <div class="metric-definition">
+        <h3>Understanding top-k metrics</h3>
+        <p><strong>Binary accuracy</strong> (also called top-k accuracy) is 100% if at least one relevant item appears
+          in the top-k positions, otherwise 0%. This matches the Python implementation and answers: "Will the user find
+          the right person in the top-k results?"</p>
+        <p><strong>Recall@k</strong> shows the percentage of all relevant items found in the top-k positions. For
+          example, if there are 4 relevant items and 3 appear in the top-5, recall@5 is 75%. This metric is more
+          informative for understanding retrieval coverage and provides granular feedback about ranking quality.</p>
+        <p>Both metrics are useful: binary accuracy tells you if the task succeeded (user found at least one match),
+          while recall@k tells you how comprehensive the top-k results are.</p>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Select k value</div>
+        <div class="k-selector">
+          <div class="k-selector-label">Top-k:</div>
+          <div class="k-buttons">
+            <div class="k-button active" onclick="setK(1)">k = 1</div>
+            <div class="k-button" onclick="setK(3)">k = 3</div>
+            <div class="k-button" onclick="setK(5)">k = 5</div>
+            <div class="k-button" onclick="setK(10)">k = 10</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Ranked list (top-k highlighted)</div>
+        <div class="ranked-list" id="rankedListTopK"></div>
+        <div class="buttons">
+          <button onclick="resetRanking()">Reset to original</button>
+          <button class="secondary" onclick="randomizeRanking()">Randomize</button>
+        </div>
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-box topk"></div>
+            <span>In top-k</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-box relevant"></div>
+            <span>Relevant (<span id="relevantLabelTopK">João Silva</span>)</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-box non-relevant"></div>
+            <span>Non-relevant (Other persons)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Top-k accuracy result</div>
+        <div class="topk-stats">
+          <div class="stat-card">
+            <div class="stat-label">Binary accuracy</div>
+            <div class="stat-value" id="topkAccuracy">0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Recall@k</div>
+            <div class="stat-value" id="recallAtK" style="color: var(--text-primary);">0.0%</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Relevant in top-k</div>
+            <div class="stat-value" id="relevantInTopK" style="color: var(--text-primary);">0 / 2</div>
+          </div>
+        </div>
+
+        <div class="accuracy-chart">
+          <div class="chart-title">Recall@k at different k values</div>
+          <div class="chart-bars" id="chartBars"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const galleryData = [
+      { id: 'JS1', identity: 'João Silva', score: 0.95 },
+      { id: 'JS2', identity: 'João Silva', score: 0.89 },
+      { id: 'MS1', identity: 'Maria Santos', score: 0.91 },
+      { id: 'MS2', identity: 'Maria Santos', score: 0.84 },
+      { id: 'PO1', identity: 'Pedro Oliveira', score: 0.82 },
+      { id: 'AC1', identity: 'Ana Costa', score: 0.73 },
+      { id: 'CF1', identity: 'Carlos Ferreira', score: 0.67 },
+      { id: 'LA1', identity: 'Lucia Almeida', score: 0.58 },
+      { id: 'RA1', identity: 'Rafael Araújo', score: 0.52 },
+      { id: 'BM1', identity: 'Beatriz Martins', score: 0.45 }
+    ];
+
+    const queryOptions = ['João Silva', 'Maria Santos'];
+
+    let currentQueryPerson = 'João Silva';
+    let currentRanking = [];
+    let currentK = 1;
+    let activeTab = 'map';
+
+    function updateRelevance() {
+      currentRanking = galleryData.map(item => ({
+        ...item,
+        relevant: item.identity === currentQueryPerson
+      })).sort((a, b) => b.score - a.score);
+    }
+
+    function switchTab(tab) {
+      activeTab = tab;
+
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+
+      if (tab === 'map') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('mapTab').classList.add('active');
+        renderRanking();
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('topkTab').classList.add('active');
+        renderTopKRanking();
+        calculateTopKAccuracy();
+      }
+    }
+
+    function setK(k) {
+      currentK = k;
+      document.querySelectorAll('.k-button').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderTopKRanking();
+      calculateTopKAccuracy();
+    }
+
+    function changeQueryPerson(person) {
+      currentQueryPerson = person;
+      updateRelevance();
+      document.getElementById('queryPersonDisplay').innerHTML = `Query<br>${currentQueryPerson}`;
+      document.getElementById('relevantLabel').textContent = currentQueryPerson;
+      document.getElementById('relevantLabelTopK').textContent = currentQueryPerson;
+      initGallery();
+      if (activeTab === 'map') {
+        renderRanking();
+      } else {
+        renderTopKRanking();
+        calculateTopKAccuracy();
+      }
+    }
+
+    function initGallery() {
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      const shuffled = [...currentRanking].sort(() => Math.random() - 0.5);
+      shuffled.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `gallery-item ${item.relevant ? 'relevant' : 'non-relevant'}`;
+        div.textContent = item.identity;
+        gallery.appendChild(div);
+      });
+    }
+
+    function renderRanking() {
+      const container = document.getElementById('rankedList');
+      container.innerHTML = '';
+      currentRanking.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = `ranked-item ${item.relevant ? 'relevant' : 'non-relevant'}`;
+        div.draggable = true;
+        div.dataset.index = index;
+        div.innerHTML = `
+<div class="rank-num">#${index + 1}</div>
+<div class="identity">${item.identity}</div>
+<div class="score">${item.score.toFixed(2)}</div>
+`;
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragover', handleDragOver);
+        div.addEventListener('drop', handleDrop);
+        div.addEventListener('dragend', handleDragEnd);
+        container.appendChild(div);
+      });
+      calculateMetrics();
+    }
+
+    function renderTopKRanking() {
+      const container = document.getElementById('rankedListTopK');
+      container.innerHTML = '';
+      currentRanking.forEach((item, index) => {
+        const div = document.createElement('div');
+        const inTopK = index < currentK;
+        let className = `ranked-item ${item.relevant ? 'relevant' : 'non-relevant'}`;
+        if (inTopK) className += ' in-topk';
+        div.className = className;
+        div.draggable = true;
+        div.dataset.index = index;
+        div.innerHTML = `
+<div class="rank-num">#${index + 1}</div>
+<div class="identity">${item.identity}</div>
+<div class="score">${item.score.toFixed(2)}</div>
+`;
+        div.addEventListener('dragstart', handleDragStart);
+        div.addEventListener('dragover', handleDragOver);
+        div.addEventListener('drop', handleDrop);
+        div.addEventListener('dragend', handleDragEnd);
+        container.appendChild(div);
+      });
+    }
+
+    let draggedIndex = null;
+
+    function handleDragStart(e) {
+      draggedIndex = parseInt(e.target.dataset.index);
+      e.target.classList.add('dragging');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const dropIndex = parseInt(e.target.closest('.ranked-item').dataset.index);
+      if (draggedIndex !== null && draggedIndex !== dropIndex) {
+        const [removed] = currentRanking.splice(draggedIndex, 1);
+        currentRanking.splice(dropIndex, 0, removed);
+        if (activeTab === 'map') {
+          renderRanking();
+        } else {
+          renderTopKRanking();
+          calculateTopKAccuracy();
+        }
+      }
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+      draggedIndex = null;
+    }
+
+    function calculateMetrics() {
+      const tableBody = document.querySelector('#precisionTable tbody');
+      tableBody.innerHTML = '';
+      let relevantCount = 0;
+      let totalRelevant = currentRanking.filter(item => item.relevant).length;
+      let precisionSum = 0;
+      let relevantRanks = [];
+
+      currentRanking.forEach((item, index) => {
+        const rank = index + 1;
+        if (item.relevant) {
+          relevantCount++;
+          relevantRanks.push(rank);
+        }
+        const precision = relevantCount / rank;
+        const row = document.createElement('tr');
+        if (item.relevant) {
+          row.classList.add('highlight');
+          precisionSum += precision;
+        }
+        row.innerHTML = `
+<td>${rank}</td>
+<td><strong>${item.identity}</strong></td>
+<td>${item.relevant ? '✓ Yes' : '✗ No'}</td>
+<td><strong>${precision.toFixed(3)}</strong></td>
+`;
+        tableBody.appendChild(row);
+      });
+
+      const ap = precisionSum / totalRelevant;
+      const apElement = document.getElementById('apValue');
+      apElement.style.animation = 'none';
+      setTimeout(() => {
+        apElement.style.animation = 'scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+      }, 10);
+      apElement.textContent = ap.toFixed(3);
+
+      const formulaParts = relevantRanks.map(r => `P@${r}`).join(' + ');
+      const precisionValues = relevantRanks.map((r, i) => {
+        let relCount = 0;
+        for (let j = 0; j < r; j++) {
+          if (currentRanking[j].relevant) relCount++;
+        }
+        return (relCount / r).toFixed(3);
+      }).join(' + ');
+
+      document.getElementById('apFormula').innerHTML = `
+<div>AP = (${formulaParts}) / ${totalRelevant}</div>
+<div style="margin-top: 10px;">AP = (${precisionValues}) / ${totalRelevant}</div>
+`;
+    }
+
+    function calculateTopKAccuracy() {
+      const topK = currentRanking.slice(0, currentK);
+      const relevantInTopK = topK.filter(item => item.relevant).length;
+      const totalRelevant = currentRanking.filter(item => item.relevant).length;
+      const accuracy = relevantInTopK > 0 ? 100 : 0;
+      const recallAtK = (relevantInTopK / totalRelevant) * 100;
+
+      const accuracyElement = document.getElementById('topkAccuracy');
+      accuracyElement.textContent = `${accuracy}%`;
+      accuracyElement.className = `stat-value ${accuracy === 100 ? 'correct' : 'incorrect'}`;
+
+      document.getElementById('relevantInTopK').textContent = `${relevantInTopK} / ${totalRelevant}`;
+
+      const recallElement = document.getElementById('recallAtK');
+      if (recallElement) {
+        recallElement.textContent = `${recallAtK.toFixed(1)}%`;
+        recallElement.className = 'stat-value';
+        recallElement.style.color = 'var(--text-primary)';
+      }
+
+      const kValues = [1, 3, 5, 10];
+      const chartBars = document.getElementById('chartBars');
+      chartBars.innerHTML = '';
+
+      kValues.forEach(k => {
+        const topKItems = currentRanking.slice(0, k);
+        const relevantCount = topKItems.filter(item => item.relevant).length;
+        const recall = (relevantCount / totalRelevant) * 100;
+
+        const row = document.createElement('div');
+        row.className = 'chart-bar-row';
+        row.innerHTML = `
+  <div class="chart-bar-label">k = ${k}</div>
+  <div class="chart-bar-container">
+    <div class="chart-bar-fill" style="width: ${recall}%"></div>
+  </div>
+  <div class="chart-bar-value">${recall.toFixed(1)}%</div>
+`;
+        chartBars.appendChild(row);
+      });
+    }
+
+    function resetRanking() {
+      updateRelevance();
+      if (activeTab === 'map') {
+        renderRanking();
+      } else {
+        renderTopKRanking();
+        calculateTopKAccuracy();
+      }
+    }
+
+    function randomizeRanking() {
+      currentRanking = [...currentRanking].sort(() => Math.random() - 0.5);
+      if (activeTab === 'map') {
+        renderRanking();
+      } else {
+        renderTopKRanking();
+        calculateTopKAccuracy();
+      }
+    }
+
+    updateRelevance();
+    initGallery();
+    renderRanking();
+    renderTopKRanking();
+    calculateTopKAccuracy();
+  </script>
+</body>
+
+</html>
