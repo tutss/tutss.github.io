@@ -839,7 +839,7 @@
     </header>
 
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('map')">Mean average precision</div>
+      <div class="tab active" onclick="switchTab('map')">Average precision</div>
       <div class="tab" onclick="switchTab('topk')">Top-k accuracy</div>
     </div>
 
@@ -851,13 +851,13 @@
       </div>
 
       <div class="metric-definition">
-        <h3>What is mean average precision?</h3>
-        <p>Mean Average Precision (mAP) measures how well a model ranks relevant items at the top of the results list.
-          Unlike binary classification metrics, mAP heavily penalizes when correct matches are ranked low.</p>
-        <p>For each query, <strong>Average Precision (AP)</strong> is calculated by averaging the precision values at
-          each position where a relevant item appears. The <strong>mean</strong> in mAP is simply the average AP across
+        <h3>What is average precision?</h3>
+        <p>Average Precision (AP) measures how well a model ranks relevant items at the top of the results list.
+          Unlike binary classification metrics, AP heavily penalizes when correct matches are ranked low.</p>
+        <p>AP is calculated by averaging the precision values at each position where a relevant item appears.
+          When you have multiple queries, <strong>Mean Average Precision (mAP)</strong> is simply the average AP across
           all queries.</p>
-        <p>mAP is particularly well-suited for face re-identification because it is <strong>rank-aware</strong> (a
+        <p>AP is particularly well-suited for face recognition because it is <strong>rank-aware</strong> (a
           correct match at rank 1 contributes much more than at rank 10), handles class imbalance naturally, and
           directly aligns with the task of ranking gallery images to find correct matches first.</p>
       </div>
@@ -984,7 +984,7 @@
         <div class="section-title">Top-k accuracy result</div>
         <div class="topk-stats">
           <div class="stat-card">
-            <div class="stat-label">Binary accuracy</div>
+            <div class="stat-label">Top-k accuracy</div>
             <div class="stat-value" id="topkAccuracy">0%</div>
           </div>
           <div class="stat-card">
