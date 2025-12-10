@@ -935,13 +935,12 @@
 
       <div class="metric-definition">
         <h3>Understanding top-k metrics</h3>
-        <p><strong>Binary accuracy</strong> (also called top-k accuracy) is 100% if at least one relevant item appears
-          in the top-k positions, otherwise 0%. This matches the Python implementation and answers: "Will the user find
-          the right person in the top-k results?"</p>
+        <p><strong>Top-k accuracy</strong> measures whether the correct identity appears among the model's k 
+          highest-confidence predictions, rather than requiring it to be the single top prediction. 
+          It answers: "Will the user find the right person in the top-k results?"</p>
         <p><strong>Recall@k</strong> shows the percentage of all relevant items found in the top-k positions. For
-          example, if there are 4 relevant items and 3 appear in the top-5, recall@5 is 75%. This metric is more
-          informative for understanding retrieval coverage and provides granular feedback about ranking quality.</p>
-        <p>Both metrics are useful: binary accuracy tells you if the task succeeded (user found at least one match),
+          example, if there are 4 relevant items and 3 appear in the top-5, recall@5 is 75%.</p>
+        <p>Both metrics are useful: top-k accuracy tells you if the task succeeded (user found at least one match),
           while recall@k tells you how comprehensive the top-k results are.</p>
       </div>
 
