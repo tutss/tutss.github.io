@@ -775,8 +775,16 @@
     }
 
     @media (max-width: 768px) {
+      body {
+        padding: 24px 16px;
+      }
+
       h1 {
-        font-size: 36px;
+        font-size: 32px;
+      }
+
+      .subtitle {
+        font-size: 15px;
       }
 
       .query-gallery {
@@ -788,25 +796,188 @@
         width: 100%;
       }
 
+      .query-item {
+        padding: 32px 20px;
+        font-size: 14px;
+      }
+
       .gallery {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+      }
+
+      .gallery-item {
+        font-size: 10px;
+        padding: 6px;
       }
 
       .tabs {
         flex-direction: column;
       }
 
+      .tab {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
       .k-selector {
         flex-direction: column;
         align-items: flex-start;
+        padding: 16px;
+      }
+
+      .k-selector-label {
+        font-size: 14px;
+      }
+
+      .k-button {
+        font-size: 12px;
+        padding: 6px 12px;
       }
 
       .card {
-        padding: 20px;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        margin-bottom: 16px;
+      }
+
+      .instructions {
+        padding: 16px;
+        font-size: 14px;
+      }
+
+      .metric-definition {
+        padding: 16px;
+        font-size: 14px;
+      }
+
+      .metric-definition h3 {
+        font-size: 16px;
+      }
+
+      .ranked-list {
+        gap: 8px;
+        padding: 16px;
+        min-height: 100px;
+      }
+
+      .ranked-item {
+        flex: 0 0 70px;
+        width: 70px;
+        height: 70px;
+      }
+
+      .ranked-item .rank-num {
+        width: 22px;
+        height: 22px;
+        font-size: 10px;
+        top: -6px;
+        left: -6px;
+      }
+
+      .ranked-item .identity {
+        font-size: 9px;
+        margin-top: 4px;
+      }
+
+      .ranked-item .score {
+        font-size: 8px;
+      }
+
+      .ranked-item.in-topk::after {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        top: -5px;
+        right: -5px;
+      }
+
+      .buttons {
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      button {
+        width: 100%;
+        font-size: 13px;
       }
 
       .topk-stats {
         grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .stat-card {
+        padding: 16px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+
+      .stat-value {
+        font-size: 36px;
+      }
+
+      .ap-value {
+        font-size: 48px;
+      }
+
+      .ap-calc {
+        padding: 16px;
+      }
+
+      .ap-calc h3 {
+        font-size: 14px;
+      }
+
+      .formula {
+        font-size: 11px;
+        padding: 12px;
+      }
+
+      .precision-table {
+        padding: 12px;
+        overflow-x: auto;
+      }
+
+      .precision-table th,
+      .precision-table td {
+        font-size: 11px;
+        padding: 8px 6px;
+      }
+
+      .accuracy-chart {
+        padding: 16px;
+      }
+
+      .chart-title {
+        font-size: 14px;
+      }
+
+      .chart-bar-label {
+        font-size: 11px;
+        min-width: 40px;
+      }
+
+      .chart-bar-value {
+        font-size: 11px;
+        min-width: 50px;
+      }
+
+      .legend {
+        font-size: 12px;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .legend-box {
+        width: 28px;
+        height: 28px;
       }
     }
 
