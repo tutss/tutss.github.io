@@ -32,6 +32,13 @@ twitter_username: artmaga23
 github_username:  tutss
 linkedin_username: arturmrsantos
 
+header_pages:
+  - about.markdown
+  - commands-and-tips.markdown
+  - materials.markdown
+  - prompts.markdown
+  - resume.markdown
+
 # Build settings
 theme: minima
 plugins:
