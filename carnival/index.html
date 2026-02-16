@@ -11,6 +11,9 @@ permalink: /carnival/
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
+<style>
+  .page-content .wrapper { max-width: 1200px; }
+</style>
 <div id="root"></div>
 {% raw %}
   <script type="text/babel">
@@ -92,17 +95,22 @@ permalink: /carnival/
 
     function ConnectorLines({ containerRef, hoveredEscola }) {
       const [lines, setLines] = useState([]);
+      const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
 
-      useEffect(() => {
+      const recalculate = useCallback(() => {
         if (!containerRef.current) return;
         const container = containerRef.current;
         const cols = container.querySelectorAll("[data-col]");
         const newLines = [];
 
+        setSvgSize({ width: container.scrollWidth, height: container.scrollHeight });
+
         for (let i = 0; i < cols.length - 1; i++) {
           const leftBars = cols[i].querySelectorAll("[data-escola]");
           const rightBars = cols[i + 1].querySelectorAll("[data-escola]");
           const containerRect = container.getBoundingClientRect();
+          const scrollLeft = container.scrollLeft;
+          const scrollTop = container.scrollTop;
 
           leftBars.forEach(lb => {
             const escola = lb.getAttribute("data-escola");
@@ -112,10 +120,10 @@ permalink: /carnival/
                 const rRect = rb.getBoundingClientRect();
                 newLines.push({
                   escola,
-                  x1: lRect.right - containerRect.left,
-                  y1: lRect.top + lRect.height / 2 - containerRect.top,
-                  x2: rRect.left - containerRect.left,
-                  y2: rRect.top + rRect.height / 2 - containerRect.top,
+                  x1: lRect.right - containerRect.left + scrollLeft,
+                  y1: lRect.top + lRect.height / 2 - containerRect.top + scrollTop,
+                  x2: rRect.left - containerRect.left + scrollLeft,
+                  y2: rRect.top + rRect.height / 2 - containerRect.top + scrollTop,
                   color: colors[escola] || "#999",
                 });
               }
@@ -123,10 +131,22 @@ permalink: /carnival/
           });
         }
         setLines(newLines);
-      }, [containerRef, hoveredEscola]);
+      }, [containerRef]);
+
+      useEffect(() => {
+        recalculate();
+      }, [recalculate, hoveredEscola]);
+
+      useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+        const resizeObserver = new ResizeObserver(recalculate);
+        resizeObserver.observe(container);
+        return () => resizeObserver.disconnect();
+      }, [containerRef, recalculate]);
 
       return (
-        <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+        <svg style={{ position: "absolute", top: 0, left: 0, width: svgSize.width, height: svgSize.height, pointerEvents: "none", zIndex: 0 }}>
           {lines.map((l, i) => {
             const isHighlighted = hoveredEscola === l.escola;
             const isDimmed = hoveredEscola && hoveredEscola !== l.escola;
@@ -171,7 +191,7 @@ permalink: /carnival/
                 Campeãs do carnaval do Rio
               </h1>
               <p style={{ fontSize: 15, color: "#666", margin: "6px 0 0", lineHeight: 1.4, fontWeight: 400 }}>
-                Ranking das escolas de samba campeãs por década na era do Sambódromo (1984-2025)
+                Ranking das escolas de samba campeãs por década na era do Sambódromo (1984-2025). O número ao lado de cada escola indica quantas vezes ela foi campeã no período.
               </p>
             </div>
 
@@ -195,7 +215,7 @@ permalink: /carnival/
               ))}
             </div>
 
-            <div ref={chartRef} style={{ position: "relative", display: "flex", gap: 32, overflowX: "auto", paddingBottom: 8 }}>
+<div ref={chartRef} style={{ position: "relative", display: "flex", gap: 32, overflowX: "auto", paddingBottom: 8 }}>
               {ready && <ConnectorLines containerRef={chartRef} hoveredEscola={hoveredEscola} />}
               {decadeData.map((dec, di) => (
                 <div key={dec.label} data-col={di} style={{ flex: 1, minWidth: 170, position: "relative", zIndex: 1 }}>
@@ -217,7 +237,8 @@ permalink: /carnival/
                           onMouseEnter={() => setHoveredEscola(item.escola)}
                           onMouseLeave={() => setHoveredEscola(null)}
                           style={{
-                            background: c,
+                            background: isHighlighted ? c + "22" : c + "15",
+                            borderLeft: `3px solid ${c}`,
                             borderRadius: 4,
                             height: BAR_H,
                             marginBottom: BAR_GAP,
@@ -227,23 +248,18 @@ permalink: /carnival/
                             padding: "0 10px",
                             boxSizing: "border-box",
                             cursor: "pointer",
-                            opacity: isDimmed ? 0.25 : 1,
-                            transform: isHighlighted ? "scaleX(1.02)" : "scaleX(1)",
-                            transformOrigin: "left center",
-                            transition: "opacity 0.2s, transform 0.15s",
-                            boxShadow: isHighlighted ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
+                            opacity: isDimmed ? 0.3 : 1,
+                            transition: "opacity 0.2s, background 0.2s",
                           }}>
                           <span style={{
-                            fontSize: 13, fontWeight: 700, color: "#fff",
+                            fontSize: 13, fontWeight: 700, color: c,
                             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
                           }}>
                             {item.escola}
                           </span>
                           <span style={{
-                            fontSize: 14, fontWeight: 800, color: "#fff",
+                            fontSize: 14, fontWeight: 800, color: c,
                             flexShrink: 0, marginLeft: 6,
-                            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
                           }}>
                             {item.count}
                           </span>
