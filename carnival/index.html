@@ -1,0 +1,313 @@
+---
+layout: default
+title: Carnival
+permalink: /carnival/
+---
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<div id="root"></div>
+{% raw %}
+  <script type="text/babel">
+    const { useRef, useEffect, useState, useCallback } = React;
+
+    function useIsMobile(breakpoint = 640) {
+      const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+      useEffect(() => {
+        const handler = () => setIsMobile(window.innerWidth < breakpoint);
+        window.addEventListener("resize", handler);
+        return () => window.removeEventListener("resize", handler);
+      }, [breakpoint]);
+      return isMobile;
+    }
+
+    const champions = [
+      {year:1984,escola:"Mangueira"},{year:1984,escola:"Portela"},
+      {year:1985,escola:"Mocidade"},{year:1986,escola:"Mangueira"},
+      {year:1987,escola:"Mangueira"},{year:1988,escola:"Vila Isabel"},
+      {year:1989,escola:"Imperatriz"},{year:1990,escola:"Mocidade"},
+      {year:1991,escola:"Mocidade"},{year:1992,escola:"Estácio de Sá"},
+      {year:1993,escola:"Salgueiro"},{year:1994,escola:"Imperatriz"},
+      {year:1995,escola:"Imperatriz"},{year:1996,escola:"Mocidade"},
+      {year:1997,escola:"Viradouro"},{year:1998,escola:"Mangueira"},
+      {year:1998,escola:"Beija-Flor"},{year:1999,escola:"Imperatriz"},
+      {year:2000,escola:"Imperatriz"},{year:2001,escola:"Imperatriz"},
+      {year:2002,escola:"Mangueira"},{year:2003,escola:"Beija-Flor"},
+      {year:2004,escola:"Beija-Flor"},{year:2005,escola:"Beija-Flor"},
+      {year:2006,escola:"Vila Isabel"},{year:2007,escola:"Beija-Flor"},
+      {year:2008,escola:"Beija-Flor"},{year:2009,escola:"Salgueiro"},
+      {year:2010,escola:"Unidos da Tijuca"},{year:2011,escola:"Beija-Flor"},
+      {year:2012,escola:"Unidos da Tijuca"},{year:2013,escola:"Vila Isabel"},
+      {year:2014,escola:"Unidos da Tijuca"},{year:2015,escola:"Beija-Flor"},
+      {year:2016,escola:"Mangueira"},{year:2017,escola:"Portela"},
+      {year:2017,escola:"Mocidade"},{year:2018,escola:"Beija-Flor"},
+      {year:2019,escola:"Mangueira"},{year:2020,escola:"Viradouro"},
+      {year:2022,escola:"Grande Rio"},{year:2023,escola:"Imperatriz"},
+      {year:2024,escola:"Viradouro"},{year:2025,escola:"Beija-Flor"},
+    ];
+
+    const colors = {
+      "Beija-Flor":"#1E88E5",
+      "Mangueira":"#43A047",
+      "Imperatriz":"#8E24AA",
+      "Mocidade":"#00897B",
+      "Portela":"#5C6BC0",
+      "Salgueiro":"#E53935",
+      "Viradouro":"#FB8C00",
+      "Vila Isabel":"#7CB342",
+      "Unidos da Tijuca":"#F4511E",
+      "Grande Rio":"#D81B60",
+      "Estácio de Sá":"#757575",
+    };
+
+    const decades = [
+      {label:"1984-1989", start:1984, end:1989},
+      {label:"1990-1999", start:1990, end:1999},
+      {label:"2000-2009", start:2000, end:2009},
+      {label:"2010-2019", start:2010, end:2019},
+      {label:"2020-2025", start:2020, end:2025},
+    ];
+
+    function getRanking(start, end) {
+      const filtered = champions.filter(c => c.year >= start && c.year <= end);
+      const counts = {};
+      filtered.forEach(c => { counts[c.escola] = (counts[c.escola] || 0) + 1; });
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([escola, count]) => ({ escola, count }));
+    }
+
+    const MAX_ROWS = 8;
+    const decadeData = decades.map(d => ({ ...d, ranking: getRanking(d.start, d.end).slice(0, MAX_ROWS) }));
+
+    const BAR_H = 36;
+    const BAR_GAP = 5;
+    const HEADER_H = 44;
+    const COL_PAD_TOP = 10;
+
+    function ConnectorLines({ containerRef, hoveredEscola }) {
+      const [lines, setLines] = useState([]);
+
+      useEffect(() => {
+        if (!containerRef.current) return;
+        const container = containerRef.current;
+        const cols = container.querySelectorAll("[data-col]");
+        const newLines = [];
+
+        for (let i = 0; i < cols.length - 1; i++) {
+          const leftBars = cols[i].querySelectorAll("[data-escola]");
+          const rightBars = cols[i + 1].querySelectorAll("[data-escola]");
+          const containerRect = container.getBoundingClientRect();
+
+          leftBars.forEach(lb => {
+            const escola = lb.getAttribute("data-escola");
+            rightBars.forEach(rb => {
+              if (rb.getAttribute("data-escola") === escola) {
+                const lRect = lb.getBoundingClientRect();
+                const rRect = rb.getBoundingClientRect();
+                newLines.push({
+                  escola,
+                  x1: lRect.right - containerRect.left,
+                  y1: lRect.top + lRect.height / 2 - containerRect.top,
+                  x2: rRect.left - containerRect.left,
+                  y2: rRect.top + rRect.height / 2 - containerRect.top,
+                  color: colors[escola] || "#999",
+                });
+              }
+            });
+          });
+        }
+        setLines(newLines);
+      }, [containerRef, hoveredEscola]);
+
+      return (
+        <svg style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
+          {lines.map((l, i) => {
+            const isHighlighted = hoveredEscola === l.escola;
+            const isDimmed = hoveredEscola && hoveredEscola !== l.escola;
+            const cx1 = l.x1 + (l.x2 - l.x1) * 0.35;
+            const cx2 = l.x1 + (l.x2 - l.x1) * 0.65;
+            return (
+              <path key={i}
+                d={`M${l.x1},${l.y1} C${cx1},${l.y1} ${cx2},${l.y2} ${l.x2},${l.y2}`}
+                fill="none"
+                stroke={l.color}
+                strokeWidth={isHighlighted ? 3.5 : 2.5}
+                opacity={isDimmed ? 0.06 : isHighlighted ? 0.9 : 0.45}
+                style={{ transition: "opacity 0.2s, stroke-width 0.2s" }}
+              />
+            );
+          })}
+        </svg>
+      );
+    }
+
+    function App() {
+      const chartRef = useRef(null);
+      const [ready, setReady] = useState(false);
+      const [hoveredEscola, setHoveredEscola] = useState(null);
+
+      useEffect(() => { setTimeout(() => setReady(true), 100); }, []);
+
+      const allCounts = {};
+      champions.forEach(c => { allCounts[c.escola] = (allCounts[c.escola] || 0) + 1; });
+      const topSchool = Object.entries(allCounts).sort((a, b) => b[1] - a[1])[0];
+
+      return (
+        <div style={{
+          color: "#333",
+          fontFamily: "'Lora', Georgia, serif",
+        }}>
+            <div style={{ borderLeft: "5px solid #E53935", paddingLeft: 16, marginBottom: 8 }}>
+              <h1 style={{
+                fontSize: 28, fontWeight: 800, margin: 0, color: "#1A1A1A",
+                lineHeight: 1.2, letterSpacing: "-0.3px",
+              }}>
+                Campeãs do carnaval do Rio
+              </h1>
+              <p style={{ fontSize: 15, color: "#666", margin: "6px 0 0", lineHeight: 1.4, fontWeight: 400 }}>
+                Ranking das escolas de samba campeãs por década na era do Sambódromo (1984-2025)
+              </p>
+            </div>
+
+            <div style={{
+              display: "flex", gap: 14, flexWrap: "wrap", margin: "18px 0 16px 0",
+              padding: "10px 0", borderBottom: "1px solid #E0E0E0",
+            }}>
+              {Object.entries(colors).map(([escola, c]) => (
+                <div key={escola}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 5, cursor: "pointer",
+                    opacity: hoveredEscola && hoveredEscola !== escola ? 0.35 : 1,
+                    transition: "opacity 0.2s",
+                  }}
+                  onMouseEnter={() => setHoveredEscola(escola)}
+                  onMouseLeave={() => setHoveredEscola(null)}
+                >
+                  <div style={{ width: 14, height: 14, borderRadius: 3, background: c }} />
+                  <span style={{ fontSize: 12, color: "#555", fontWeight: 600 }}>{escola}</span>
+                </div>
+              ))}
+            </div>
+
+            <div ref={chartRef} style={{ position: "relative", display: "flex", gap: 32, overflowX: "auto", paddingBottom: 8 }}>
+              {ready && <ConnectorLines containerRef={chartRef} hoveredEscola={hoveredEscola} />}
+              {decadeData.map((dec, di) => (
+                <div key={dec.label} data-col={di} style={{ flex: 1, minWidth: 170, position: "relative", zIndex: 1 }}>
+                  <div style={{
+                    textAlign: "center", fontSize: 14, fontWeight: 700, color: "#1A1A1A",
+                    height: HEADER_H, display: "flex", alignItems: "center", justifyContent: "center",
+                    borderBottom: "2px solid #333",
+                    letterSpacing: "0.5px",
+                  }}>
+                    {dec.label}
+                  </div>
+                  <div style={{ padding: `${COL_PAD_TOP}px 4px 0` }}>
+                    {dec.ranking.map((item) => {
+                      const c = colors[item.escola] || "#999";
+                      const isHighlighted = hoveredEscola === item.escola;
+                      const isDimmed = hoveredEscola && hoveredEscola !== item.escola;
+                      return (
+                        <div key={item.escola} data-escola={item.escola}
+                          onMouseEnter={() => setHoveredEscola(item.escola)}
+                          onMouseLeave={() => setHoveredEscola(null)}
+                          style={{
+                            background: c,
+                            borderRadius: 4,
+                            height: BAR_H,
+                            marginBottom: BAR_GAP,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "0 10px",
+                            boxSizing: "border-box",
+                            cursor: "pointer",
+                            opacity: isDimmed ? 0.25 : 1,
+                            transform: isHighlighted ? "scaleX(1.02)" : "scaleX(1)",
+                            transformOrigin: "left center",
+                            transition: "opacity 0.2s, transform 0.15s",
+                            boxShadow: isHighlighted ? "0 2px 8px rgba(0,0,0,0.15)" : "none",
+                          }}>
+                          <span style={{
+                            fontSize: 13, fontWeight: 700, color: "#fff",
+                            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                          }}>
+                            {item.escola}
+                          </span>
+                          <span style={{
+                            fontSize: 14, fontWeight: 800, color: "#fff",
+                            flexShrink: 0, marginLeft: 6,
+                            textShadow: "0 1px 2px rgba(0,0,0,0.2)",
+                          }}>
+                            {item.count}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{
+              display: "flex", gap: 20, marginTop: 28, flexWrap: "wrap", justifyContent: "center",
+            }}>
+              <div style={{
+                background: "#FAFAFA", borderRadius: 6, padding: "14px 20px",
+                flex: "1 1 200px", maxWidth: 280, border: "1px solid #E0E0E0",
+              }}>
+                <div style={{ fontSize: 11, color: "#999", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 4, fontWeight: 600 }}>
+                  Maior campeã
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: colors[topSchool[0]] }}>
+                  {topSchool[0]}
+                </div>
+                <div style={{ fontSize: 13, color: "#888" }}>{topSchool[1]} títulos</div>
+              </div>
+              <div style={{
+                background: "#FAFAFA", borderRadius: 6, padding: "14px 20px",
+                flex: "1 1 200px", maxWidth: 280, border: "1px solid #E0E0E0",
+              }}>
+                <div style={{ fontSize: 11, color: "#999", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 4, fontWeight: 600 }}>
+                  Total de títulos
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#E53935" }}>{champions.length}</div>
+                <div style={{ fontSize: 13, color: "#888" }}>desde 1984</div>
+              </div>
+              <div style={{
+                background: "#FAFAFA", borderRadius: 6, padding: "14px 20px",
+                flex: "1 1 200px", maxWidth: 280, border: "1px solid #E0E0E0",
+              }}>
+                <div style={{ fontSize: 11, color: "#999", textTransform: "uppercase", letterSpacing: 1.2, marginBottom: 4, fontWeight: 600 }}>
+                  Escolas campeãs
+                </div>
+                <div style={{ fontSize: 22, fontWeight: 800, color: "#43A047" }}>
+                  {Object.keys(allCounts).length}
+                </div>
+                <div style={{ fontSize: 13, color: "#888" }}>escolas diferentes</div>
+              </div>
+            </div>
+
+            <div style={{
+              marginTop: 24, padding: "12px 0 0", borderTop: "1px solid #E0E0E0",
+              fontSize: 11, color: "#999", display: "flex", justifyContent: "space-between",
+              flexWrap: "wrap", gap: 4, lineHeight: 1.6,
+            }}>
+              <div>
+                <div>Títulos compartilhados contados individualmente</div>
+                <div>Fonte: LIESA / Wikipedia</div>
+              </div>
+            </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+{% endraw %}
