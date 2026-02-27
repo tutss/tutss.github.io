@@ -264,7 +264,7 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.9.1)
-    uri (1.0.3)
+    uri (1.0.4)
     webrick (1.9.1)
 
 PLATFORMS
