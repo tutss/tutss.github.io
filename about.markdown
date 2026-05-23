@@ -6,7 +6,7 @@ permalink: /about/
 
 > **For work related stuff, check my CV: [here](/files/cv_english_ds.pdf)**
 
-Hey! I'm Artur Magalhães - feel free to call me Arthur as well :) - currently working as a Data Scientist Specialist at iFood in São Paulo. I previously worked at Amazon as a Data Scientist as well. While my professional life revolves around machine learning and data, there's much more that drives me.
+Hey! I'm Artur Magalhães - feel free to call me Arthur as well :) - currently working as an Applied Scientist II at Amazon. While my professional life revolves around machine learning and data, there's much more that drives me.
 
 I'm a passionate reader who enjoys books across economics, literature, history, politics, and mathematics – currently working through "Empire of AI" by Karen Hao, "The Left Hand of Darkness" by Ursula K. Le Guin, and "How to Solve It" by  George Polya. There's something fascinating about how different fields of knowledge connect and influence each other.
 
