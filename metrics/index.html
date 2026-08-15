@@ -1,16 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
+---
+layout: default
+title: Interactive retrieval metrics
+permalink: /metrics/
+---
 
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Interactive retrieval metrics</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;600&display=swap"
-    rel="stylesheet">
-  <style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600&display=swap"
+  rel="stylesheet">
+
+<style>
+    .page-content .wrapper { max-width: 1200px; }
+
     :root {
       --bg-primary: #f5f7fa;
       --bg-secondary: #ffffff;
@@ -36,21 +38,23 @@
       --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.06);
       --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.06), 0 4px 6px rgba(0, 0, 0, 0.05);
       --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.08), 0 10px 10px rgba(0, 0, 0, 0.04);
+
+      --site-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    * {
+    .metrics-page * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    body {
-      font-family: 'Crimson Pro', Georgia, serif;
+    .metrics-page {
+      font-family: var(--site-font);
       background: var(--bg-primary);
       color: var(--text-primary);
       line-height: 1.6;
       padding: 40px 24px;
-      min-height: 100vh;
+      border-radius: 16px;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -73,13 +77,13 @@
       }
     }
 
-    header {
+    .metrics-page header {
       text-align: center;
       margin-bottom: 48px;
       animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s backwards;
     }
 
-    h1 {
+    .metrics-page h1 {
       font-size: 48px;
       font-weight: 700;
       letter-spacing: -0.03em;
@@ -234,7 +238,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      font-family: 'Crimson Pro', Georgia, serif;
+      font-family: inherit;
     }
 
     .query-selector select:hover {
@@ -474,7 +478,7 @@
       gap: 12px;
     }
 
-    button {
+    .metrics-page button {
       padding: 10px 20px;
       border-radius: 10px;
       font-size: 14px;
@@ -487,23 +491,23 @@
       box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
     }
 
-    button:hover {
+    .metrics-page button:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
     }
 
-    button:active {
+    .metrics-page button:active {
       transform: translateY(0);
     }
 
-    button.secondary {
+    .metrics-page button.secondary {
       background: var(--bg-secondary);
       color: var(--accent-blue);
       border: 2px solid var(--accent-blue);
       box-shadow: none;
     }
 
-    button.secondary:hover {
+    .metrics-page button.secondary:hover {
       background: rgba(0, 122, 255, 0.05);
     }
 
@@ -775,11 +779,11 @@
     }
 
     @media (max-width: 768px) {
-      body {
+      .metrics-page {
         padding: 24px 16px;
       }
 
-      h1 {
+      .metrics-page h1 {
         font-size: 32px;
       }
 
@@ -981,28 +985,27 @@
       }
     }
 
-    ::-webkit-scrollbar {
+    .metrics-page ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
     }
 
-    ::-webkit-scrollbar-track {
+    .metrics-page ::-webkit-scrollbar-track {
       background: var(--bg-tertiary);
       border-radius: 4px;
     }
 
-    ::-webkit-scrollbar-thumb {
+    .metrics-page ::-webkit-scrollbar-thumb {
       background: var(--border-medium);
       border-radius: 4px;
     }
 
-    ::-webkit-scrollbar-thumb:hover {
+    .metrics-page ::-webkit-scrollbar-thumb:hover {
       background: var(--text-tertiary);
     }
   </style>
-</head>
 
-<body>
+<div class="metrics-page">
   <div class="container">
     <header>
       <h1>Interactive retrieval metrics</h1>
@@ -1176,6 +1179,7 @@
     </div>
 
   </div>
+</div>
 
   <script>
     const galleryData = [
@@ -1455,6 +1459,3 @@
     renderTopKRanking();
     calculateTopKAccuracy();
   </script>
-</body>
-
-</html>
