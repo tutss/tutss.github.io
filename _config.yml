@@ -32,6 +32,10 @@ twitter_username: artmaga23
 github_username:  tutss
 linkedin_username: arturmrsantos
 
+# Shop (/shop) settings. Products live in _data/products.yml.
+shop:
+  whatsapp: "5511991379683" # WhatsApp number (country + area + number, digits only)
+
 header_pages:
   - about.markdown
   - commands-and-tips.markdown
