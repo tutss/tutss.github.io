@@ -1,0 +1,135 @@
+# Shop catalog for /shop/ (A loja).
+# Each entry is one item for sale. Add new items with the `/new-item` command,
+# or by hand following this shape:
+#
+#   - id: unique-slug          # used in the URL hash (#unique-slug), keep it short
+#     family: iPhones          # groups items into filter chips (reuse existing names)
+#     title: iPhone 14 128GB
+#     condition: novo          # novo | usado
+#     price: 3990              # selling price, plain number (BRL)
+#     original: 4499           # optional list/original price for the strikethrough; omit if none
+#     short: One-line summary shown on the list layout.
+#     notes: Your personal notes about the item (Minhas notas).
+#     vendor: Manufacturer-style description (Descrição do fabricante).
+#     specs:                   # spec rows, [label, value]
+#       - ["Armazenamento", "128 GB"]
+#     images: []               # optional photo paths, e.g. ["/files/images/shop/ip14-1.jpg"]
+
+- id: ip14
+  family: iPhones
+  title: iPhone 14 128GB
+  condition: novo
+  price: 3990
+  original: 4499
+  short: Praticamente novo, aberto só para teste. Troquei pelo 15.
+  notes: Aberto apenas para teste, praticamente novo — troquei pelo iPhone 15. Sem marcas de uso, acompanha caixa e cabo.
+  vendor: iPhone 14 com chip A15 Bionic, tela Super Retina XDR de 6,1", câmera dupla de 12 MP e Detecção de Acidente.
+  specs:
+    - ["Armazenamento", "128 GB"]
+    - ["Saúde da bateria", "100%"]
+    - ["Cor", "Meia-noite"]
+    - ["Estado", "Aberto p/ teste"]
+    - ["Garantia", "Apple até 2025"]
+  images: []
+
+- id: ip13
+  family: iPhones
+  title: iPhone 13 128GB
+  condition: usado
+  price: 2799
+  original: 3999
+  short: Um ano e meio de uso, sempre com capa e película. Bateria ótima.
+  notes: Usei por 1 ano e meio, sempre com capa e película de vidro. Bateria ainda ótima para o dia a dia. Acompanha caixa e cabo originais.
+  vendor: iPhone 13. Tela Super Retina XDR de 6,1". Chip A15 Bionic. Câmera dupla de 12 MP com modo Cinema. 5G.
+  specs:
+    - ["Armazenamento", "128 GB"]
+    - ["Saúde da bateria", "87%"]
+    - ["Cor", "Meia-noite"]
+    - ["Segurança", "Face ID"]
+    - ["Rede", "Desbloqueado · 5G"]
+  images: []
+
+- id: ip12
+  family: iPhones
+  title: iPhone 12 64GB
+  condition: usado
+  price: 2090
+  original: 3299
+  short: Segundo aparelho, pouco uso. Pequena marca na lateral (foto 3).
+  notes: Era meu segundo aparelho, ficou pouco tempo em uso. Tem uma pequena marca de uso na lateral, visível na foto 3. Funciona perfeitamente.
+  vendor: iPhone 12. Tela OLED Super Retina XDR de 6,1". Chip A14 Bionic. Câmera dupla de 12 MP. 5G.
+  specs:
+    - ["Armazenamento", "64 GB"]
+    - ["Saúde da bateria", "82%"]
+    - ["Cor", "Azul"]
+    - ["Segurança", "Face ID"]
+    - ["Acessórios", "Cabo incluso"]
+  images: []
+
+- id: app2
+  family: Fones de ouvido
+  title: AirPods Pro (2ª geração)
+  condition: usado
+  price: 990
+  original: 1899
+  short: Comprados nos EUA em 2024. Cancelamento de ruído impecável.
+  notes: Comprados nos EUA em 2024. O cancelamento de ruído continua impecável e o estojo tem pouquíssimo uso. Acompanha as ponteiras extras.
+  vendor: AirPods Pro (2ª geração) com cancelamento ativo de ruído, modo ambiente adaptável e áudio espacial. Estojo MagSafe com USB-C.
+  specs:
+    - ["Tipo", "In-ear ANC"]
+    - ["Estojo", "MagSafe (USB-C)"]
+    - ["Áudio", "Espacial"]
+    - ["Bateria", "Até 6h"]
+    - ["Ponteiras", "4 tamanhos"]
+  images: []
+
+- id: xm4
+  family: Fones de ouvido
+  title: Sony WH-1000XM4
+  condition: usado
+  price: 1150
+  original: 2499
+  short: Melhor fone que já tive. Vendo porque migrei para o over-ear da Apple.
+  notes: O melhor fone que já tive. Vendo porque migrei para o over-ear da Apple. Espumas em perfeito estado, acompanha o case rígido original.
+  vendor: Headphone over-ear Sony WH-1000XM4 com cancelamento de ruído líder de mercado, áudio de alta resolução e até 30h de bateria.
+  specs:
+    - ["Tipo", "Over-ear ANC"]
+    - ["Bateria", "30 h"]
+    - ["Bluetooth", "Multiponto"]
+    - ["Acessórios", "Case rígido"]
+    - ["Cor", "Preto"]
+  images: []
+
+- id: aw8
+  family: Apple Watch
+  title: Apple Watch Series 8 45mm
+  condition: usado
+  price: 1490
+  original: 2999
+  short: Uso diário por 1 ano. Vai com a pulseira original + uma extra.
+  notes: Usei no dia a dia por cerca de 1 ano. Vai com a pulseira esportiva original e uma pulseira extra de brinde. Carregador incluso.
+  vendor: Apple Watch Series 8 (GPS) 45mm. Sensor de temperatura, app ECG, monitoramento de oxigênio e detecção de acidente.
+  specs:
+    - ["Caixa", "45 mm alumínio"]
+    - ["Conectividade", "GPS"]
+    - ["Bateria", "91%"]
+    - ["Pulseiras", "2 inclusas"]
+    - ["Cor", "Meia-noite"]
+  images: []
+
+- id: awse
+  family: Apple Watch
+  title: Apple Watch SE 40mm
+  condition: novo
+  price: 1690
+  original: 1899
+  short: Ganhei e não uso. Lacrado, com nota fiscal.
+  notes: Ganhei de presente e acabei não usando. Está lacrado, com nota fiscal disponível para transferência de garantia.
+  vendor: Apple Watch SE (2ª geração, GPS) 40mm. Chip S8, detecção de acidente, monitoramento de sono e atividade.
+  specs:
+    - ["Estado", "Lacrado / novo"]
+    - ["Caixa", "40 mm"]
+    - ["Conectividade", "GPS"]
+    - ["Documento", "Nota fiscal"]
+    - ["Cor", "Estelar"]
+  images: []
