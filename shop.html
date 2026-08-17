@@ -1,0 +1,97 @@
+---
+permalink: /shop/
+title: Loja
+sitemap: false
+---
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loja — {{ site.title }}</title>
+  <meta name="description" content="Minhas coisas à venda. Escolha um item e fale comigo no WhatsApp.">
+  <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/shop.css' | relative_url }}">
+</head>
+<body>
+<div style="min-height:100vh;background:var(--color-bg);color:var(--color-text)">
+
+  <header class="shop-header">
+    <div class="shop-header-wrap">
+      <a class="shop-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <nav class="shop-header-nav">
+        <a href="{{ '/' | relative_url }}">Blog</a>
+        <a href="{{ '/shop/' | relative_url }}" aria-current="page">Shop</a>
+      </nav>
+    </div>
+  </header>
+
+  <main style="max-width:840px;margin:0 auto;padding:clamp(20px,6vw,36px) clamp(16px,5vw,32px) 64px">
+
+    <!-- Results view -->
+    <section id="view-results">
+      <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);font-family:var(--font-heading)">Catálogo</div>
+      <h1 style="font-size:clamp(30px,9vw,42px);text-transform:uppercase;letter-spacing:.01em;margin:2px 0 8px;line-height:1.02">A loja</h1>
+      <p class="text-muted" style="margin:0 0 var(--space-6);max-width:56ch">Minhas coisas à venda. Sem carrinho: escolha um item e fale comigo direto no WhatsApp.</p>
+
+      <div style="position:relative;margin-bottom:var(--space-4)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" class="input" type="search" placeholder="Buscar por nome ou marca…" style="padding-left:36px;min-height:42px" aria-label="Buscar">
+      </div>
+
+      <div id="family-chips" style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-4)"></div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-6);align-items:flex-end;margin-bottom:var(--space-6)">
+        <div>
+          <label style="display:block;font-size:12px;margin-bottom:5px;color:color-mix(in srgb,var(--color-text) 70%,transparent)">Condição</label>
+          <div class="seg" role="radiogroup" aria-label="Condição">
+            <label class="seg-opt"><input type="radio" name="cond" value="todos" checked>Todos</label>
+            <label class="seg-opt"><input type="radio" name="cond" value="novo">Novos</label>
+            <label class="seg-opt"><input type="radio" name="cond" value="usado">Usados</label>
+          </div>
+        </div>
+        <div style="flex:1;min-width:190px">
+          <label for="max-price" style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px;color:color-mix(in srgb,var(--color-text) 70%,transparent)"><span>Preço até</span><span id="max-price-label" style="color:var(--color-accent);font-family:var(--font-heading);font-size:14px"></span></label>
+          <input id="max-price" type="range" min="0" max="100" step="50" value="100" style="width:100%;accent-color:var(--color-accent)" aria-label="Preço máximo">
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--color-divider);padding-top:var(--space-3);margin-bottom:var(--space-4)">
+        <span id="results-count" class="text-muted" style="font-size:13px;letter-spacing:.02em"></span>
+      </div>
+
+      <div id="results-empty" style="display:none">
+        <div class="blueprint" style="position:relative;padding:var(--space-8) var(--space-4);text-align:center;color:color-mix(in srgb,var(--color-text) 60%,transparent)">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <p style="margin:0 0 4px;font-family:var(--font-heading);font-size:18px;text-transform:uppercase;color:var(--color-text)">Nada por aqui</p>
+          <p style="margin:0;font-size:13px">Ajuste a busca, a condição ou o preço.</p>
+        </div>
+      </div>
+
+      <div id="results-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:var(--space-4)"></div>
+    </section>
+
+    <!-- Detail view -->
+    <section id="view-detail" style="display:none"></section>
+
+  </main>
+</div>
+
+<noscript>
+  <div style="max-width:840px;margin:0 auto;padding:24px">
+    <p>Ative o JavaScript para navegar a loja. Itens à venda:</p>
+    <ul>
+      {% for p in site.data.products %}
+      <li><strong>{{ p.title }}</strong> — R$ {{ p.price }} —
+        <a href="https://wa.me/{{ site.shop.whatsapp }}?text={{ 'Olá Artur! Tenho interesse no ' | append: p.title | append: '. Ainda está disponível?' | url_encode }}">Comprar no WhatsApp</a>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</noscript>
+
+<script id="shop-data" type="application/json">{{ site.data.products | jsonify }}</script>
+<script>window.SHOP_WA = {{ site.shop.whatsapp | jsonify }};</script>
+<script src="{{ '/assets/shop.js' | relative_url }}"></script>
+</body>
+</html>

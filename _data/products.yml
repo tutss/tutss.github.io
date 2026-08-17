@@ -1,0 +1,33 @@
+# Shop catalog for /shop/ (A loja).
+# Each entry is one item for sale. Add new items with the `/new-item` command and
+# retire sold ones with `/sold-item`, or edit by hand following this shape:
+#
+#   - id: unique-slug          # used in the URL hash (#unique-slug), keep it short
+#     family: Fones de ouvido  # groups items into filter chips (reuse existing names)
+#     title: AirPods 4 com ANC
+#     condition: usado         # novo | usado
+#     price: 1200              # selling price, plain number (BRL)
+#     original: 1899           # optional list/original price for the strikethrough; omit if none
+#     short: One-line summary shown on the list layout.
+#     notes: Your personal notes about the item (Minhas notas).
+#     vendor: Manufacturer-style description (Descrição do fabricante).
+#     specs:                   # spec rows, [label, value]
+#       - ["Tipo", "In-ear ANC"]
+#     images: []               # optional photo paths, e.g. ["/files/images/shop/ip14-1.jpg"]
+
+- id: airpods4
+  family: Fones de ouvido
+  title: AirPods 4 com ANC
+  condition: usado
+  price: 1200
+  original: 1899
+  short: Aberto, pouco uso. Cancelamento de ruído impecável. Caixa e estojo inclusos.
+  notes: Usado uma vez. O cancelamento ativo de ruído está impecável, 100%. Acompanha a caixa e o estojo de carregamento USB-C.
+  vendor: AirPods 4 com Cancelamento Ativo de Ruído, áudio espacial personalizado, chip H2 e estojo de carregamento USB-C. Resistentes a água e poeira (IP54).
+  specs:
+    - ["Tipo", "In-ear ANC"]
+    - ["Chip", "H2"]
+    - ["Estojo", "USB-C"]
+    - ["Áudio", "Espacial personalizado"]
+    - ["Resistência", "IP54"]
+  images: ["/files/images/shop/airpods4-1.jpg", "/files/images/shop/airpods4-2.jpg", "/files/images/shop/airpods4-3.jpg"]
