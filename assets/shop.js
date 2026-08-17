@@ -193,14 +193,7 @@
 
   function detailHtml(vm) {
     return (
-      '<button type="button" class="btn btn-ghost" data-back style="padding-left:0;margin-bottom:var(--space-3)">← Voltar aos resultados</button>' +
-      '<nav aria-label="Trilha" class="text-muted" style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;font-size:12px;margin-bottom:var(--space-6)">' +
-        '<a href="#" data-crumb-home style="text-decoration:none;color:var(--color-accent)">Loja</a>' +
-        '<span style="opacity:.5">/</span>' +
-        '<a href="#" data-crumb-family="' + esc(vm.family) + '" style="text-decoration:none;color:var(--color-accent)">' + esc(vm.family) + "</a>" +
-        '<span style="opacity:.5">/</span>' +
-        '<span style="color:var(--color-text)">' + esc(vm.title) + "</span>" +
-      "</nav>" +
+      '<button type="button" class="btn btn-ghost" data-back style="padding-left:0;margin-bottom:var(--space-6)">← Voltar aos resultados</button>' +
 
       '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:var(--space-8);align-items:start">' +
         '<div style="display:flex;flex-direction:column;gap:var(--space-2);position:sticky;top:16px">' +
