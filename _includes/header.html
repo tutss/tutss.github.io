@@ -12,6 +12,12 @@
         </svg>
       </button>
       <div class="extras-dropdown">
+        {%- for path in page_paths -%}
+          {%- assign my_page = site.pages | where: "path", path | first -%}
+          {%- if my_page.title -%}
+          <a href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
+          {%- endif -%}
+        {%- endfor -%}
         <a href="{{ "/carnival/" | relative_url }}">carnival</a>
         <a href="{{ "/life/" | relative_url }}">life</a>
         <a href="{{ "/game/" | relative_url }}">game</a>
@@ -31,13 +37,9 @@
         </label>
 
         <div class="trigger">
-          {%- for path in page_paths -%}
-            {%- assign my_page = site.pages | where: "path", path | first -%}
-            {%- if my_page.title -%}
-            <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
-            {%- endif -%}
-          {%- endfor -%}
-          <a class="page-link shop-link" href="{{ "/shop/" | relative_url }}">Shop</a>
+          <a class="page-link" href="{{ "/" | relative_url }}">Blog</a>
+          <a class="page-link" href="{{ "/playlists/" | relative_url }}">Playlists</a>
+          <a class="page-link" href="{{ "/shop/" | relative_url }}">Shop</a>
         </div>
       </nav>
     {%- endif -%}
@@ -98,19 +100,6 @@
 .extras-dropdown a:hover {
   background: #f5f5f5;
   color: #111;
-}
-.site-nav .page-link.shop-link {
-  border: 1px solid #2f7fd1;
-  color: #2f7fd1;
-  border-radius: 999px;
-  padding: 4px 15px;
-  line-height: 1.2;
-  transition: background 0.15s, color 0.15s;
-}
-.site-nav .page-link.shop-link:hover {
-  background: #2f7fd1;
-  color: #fff;
-  text-decoration: none;
 }
 </style>
 
