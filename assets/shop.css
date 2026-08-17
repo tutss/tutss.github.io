@@ -101,8 +101,6 @@ h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: var(--font-headi
 .blueprint > .corner.br { bottom: -6px; right: -6px; }
 
 .duotone{position:relative;overflow:hidden}
-.duotone::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:var(--color-accent);mix-blend-mode:color}
 
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
@@ -309,9 +307,6 @@ textarea.input { min-height: 90px; resize: vertical; }
 }
 .img-ph svg { opacity: 0.6; }
 .img-ph span { font-size: 12px; line-height: 1.25; }
-
-/* Keep the accent duotone from tinting the placeholder into invisibility. */
-.duotone:has(.img-ph)::after { display: none; }
 
 @media (max-width: 560px) {
   .nav { gap: var(--space-3); }
