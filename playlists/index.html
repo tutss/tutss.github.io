@@ -19,6 +19,46 @@ permalink: /playlists/
   .site-header .extras-dropdown a { color: #b3b3b3; }
   .site-header .extras-dropdown a:hover { background: #242424; color: #fff; }
 
+  /* Mobile: show Blog / Playlists / Shop inline, like the /shop header,
+     instead of minima's hamburger dropdown. */
+  @media screen and (max-width: 600px) {
+    .site-header .wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    /* minima's clearfix pseudo-elements would otherwise count as flex items
+       and push the nav away from the right edge. */
+    .site-header .wrapper::before,
+    .site-header .wrapper::after { content: none; }
+    .site-header .site-title { float: none; }
+    .site-header .site-nav {
+      position: static;
+      float: none;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      line-height: 1.5;
+      text-align: right;
+    }
+    .site-header .site-nav label[for="nav-trigger"],
+    .site-header .site-nav .menu-icon { display: none; }
+    .site-header .site-nav input ~ .trigger,
+    .site-header .site-nav input:checked ~ .trigger {
+      clear: none;
+      display: flex;
+      gap: 20px;
+      padding-bottom: 0;
+    }
+    .site-header .site-nav .page-link {
+      display: inline;
+      padding: 0;
+      margin: 0;
+      white-space: nowrap;
+    }
+  }
+
   .playlists-heading { margin: 8px 0 24px; }
   .playlists-heading h1 { font-size: 32px; font-weight: 700; margin: 0 0 4px; color: #fff; }
   .playlists-heading .sub { color: #b3b3b3; margin: 0; font-size: 14px; }
