@@ -9,18 +9,22 @@ sitemap: false
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Loja — {{ site.title }}</title>
-  <meta name="description" content="Minhas coisas à venda — iPhones, fones e Apple Watch. Escolha um item e fale comigo no WhatsApp.">
+  <meta name="description" content="Minhas coisas à venda. Escolha um item e fale comigo no WhatsApp.">
   <link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
   <link rel="stylesheet" href="{{ '/assets/shop.css' | relative_url }}">
 </head>
 <body>
 <div style="min-height:100vh;background:var(--color-bg);color:var(--color-text)">
 
-  <nav class="nav" style="max-width:840px;margin:0 auto;border-bottom:1px solid var(--color-divider);gap:var(--space-4)">
-    <a class="nav-brand" href="{{ '/' | relative_url }}" style="text-decoration:none;color:var(--color-text)">{{ site.title }}</a>
-    <a href="{{ '/' | relative_url }}" style="text-decoration:none">Blog</a>
-    <span aria-current="page" style="color:var(--color-accent);font-size:14px">Loja</span>
-  </nav>
+  <header class="shop-header">
+    <div class="shop-header-wrap">
+      <a class="shop-title" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+      <nav class="shop-header-nav">
+        <a href="{{ '/' | relative_url }}">Blog</a>
+        <a href="{{ '/shop/' | relative_url }}" aria-current="page">Shop</a>
+      </nav>
+    </div>
+  </header>
 
   <main style="max-width:840px;margin:0 auto;padding:clamp(20px,6vw,36px) clamp(16px,5vw,32px) 64px">
 
@@ -28,7 +32,7 @@ sitemap: false
     <section id="view-results">
       <div style="font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);font-family:var(--font-heading)">Catálogo</div>
       <h1 style="font-size:clamp(30px,9vw,42px);text-transform:uppercase;letter-spacing:.01em;margin:2px 0 8px;line-height:1.02">A loja</h1>
-      <p class="text-muted" style="margin:0 0 var(--space-6);max-width:56ch">Minhas coisas à venda — iPhones, fones e Apple Watch. Sem carrinho: escolha um item e fale comigo direto no WhatsApp.</p>
+      <p class="text-muted" style="margin:0 0 var(--space-6);max-width:56ch">Minhas coisas à venda. Sem carrinho: escolha um item e fale comigo direto no WhatsApp.</p>
 
       <div style="position:relative;margin-bottom:var(--space-4)">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);opacity:.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
