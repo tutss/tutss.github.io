@@ -28,6 +28,10 @@ permalink: /playlists/
       justify-content: space-between;
       gap: 16px;
     }
+    /* minima's clearfix pseudo-elements would otherwise count as flex items
+       and push the nav away from the right edge. */
+    .site-header .wrapper::before,
+    .site-header .wrapper::after { content: none; }
     .site-header .site-title { float: none; }
     .site-header .site-nav {
       position: static;
