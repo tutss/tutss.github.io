@@ -313,6 +313,31 @@ textarea.input { min-height: 90px; resize: vertical; }
 .img-ph svg { opacity: 0.6; }
 .img-ph span { font-size: 12px; line-height: 1.25; }
 
+.detail-media .duotone { cursor: zoom-in; }
+
+body.lb-open { overflow: hidden; }
+
+.lightbox {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(10, 12, 15, 0.88);
+  z-index: 1000;
+}
+.lightbox[hidden] { display: none; }
+.lightbox img {
+  max-width: 92vw; max-height: 92vh;
+  object-fit: contain;
+  cursor: zoom-out;
+  user-select: none;
+}
+.lightbox-close {
+  position: absolute; top: 12px; right: 16px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  color: #fff; font-size: 26px; line-height: 1; cursor: pointer;
+}
+
 @media (max-width: 560px) {
   .nav { gap: var(--space-3); }
 }

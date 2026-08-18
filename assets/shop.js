@@ -246,6 +246,25 @@
     );
   }
 
+  // — lightbox —
+
+  var lightbox = document.querySelector(".lightbox");
+  var lightboxImg = lightbox.querySelector("img");
+  var lightboxClose = lightbox.querySelector(".lightbox-close");
+
+  function openLightbox(src, alt) {
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || "";
+    lightbox.hidden = false;
+    document.body.classList.add("lb-open");
+    lightboxClose.focus();
+  }
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    document.body.classList.remove("lb-open");
+  }
+
   // — views / routing —
 
   function showResults() {
@@ -311,8 +330,11 @@
       applyFilters();
     });
 
-    // Delegated clicks for cards (results) and controls (detail).
+    // Delegated clicks for cards (results), detail photos (lightbox), and controls (detail).
     document.addEventListener("click", function (e) {
+      var photo = e.target.closest(".detail-media img");
+      if (photo) { openLightbox(photo.getAttribute("src"), photo.getAttribute("alt")); return; }
+
       var card = e.target.closest("[data-open]");
       if (card) { location.hash = encodeURIComponent(card.getAttribute("data-open")); return; }
 
@@ -321,6 +343,12 @@
 
       var crumbFam = e.target.closest("[data-crumb-family]");
       if (crumbFam) { e.preventDefault(); goResults(crumbFam.getAttribute("data-crumb-family")); return; }
+    });
+
+    lightbox.addEventListener("click", function () { closeLightbox(); });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && !lightbox.hidden) closeLightbox();
     });
 
     window.addEventListener("hashchange", route);
