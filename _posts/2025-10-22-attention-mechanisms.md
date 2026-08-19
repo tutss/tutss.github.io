@@ -1,5 +1,7 @@
 ---
 layout: post
+redirect_from:
+  - /research/python/2025/10/23/attention-mechanisms.html
 title: "Attention mechanisms: self-attention, cross-attention, and co-attention"
 date: 2025-10-23 20:02:14 -0300
 categories: [research, python]

@@ -1,5 +1,7 @@
 ---
 layout: post
+redirect_from:
+  - /2020/11/14/non-linear.html
 title:  "Não linearidade em redes neurais com Pytorch"
 date:   2020-11-14 15:16:54 -0300
 ---

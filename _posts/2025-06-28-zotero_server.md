@@ -1,5 +1,7 @@
 ---
 layout: post
+redirect_from:
+  - /python/research/mcp/zotero/2025/06/29/zotero_server.html
 title: "Building a Zotero MCP Server for research management"
 date:   2025-06-29 13:46:33 -0300
 categories: [python, research, mcp, zotero]

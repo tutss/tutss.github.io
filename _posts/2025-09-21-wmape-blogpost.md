@@ -1,5 +1,7 @@
 ---
 layout: post
+redirect_from:
+  - /python/data-science/metrics/2025/09/21/wmape-blogpost.html
 title: "WMAPE vs MAPE"
 date: 2025-09-21 17:21:00 -0300
 categories: [python, data-science, metrics]
