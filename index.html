@@ -1,0 +1,227 @@
+---
+permalink: /
+title: Artur Magalhães
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ site.title }}</title>
+<link rel="icon" href="{{ '/favicon.ico' | relative_url }}">
+<style>
+  :root {
+    --text: #111;
+    --bg: #fdfdfd;
+    --grey: #828282;
+    --line: #e8e8e8;
+    --link: #2a7ae2;
+    --tech: #2a7ae2;
+    --random: #c85a2c;
+    --playlists: #1db954;
+    --shop: #5980a6;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--link); text-decoration: none; }
+
+  .site-header {
+    border-top: 5px solid #424242;
+    border-bottom: 1px solid var(--line);
+    min-height: 55px;
+  }
+  .wrapper { max-width: 740px; margin: 0 auto; padding: 0 30px; }
+  .site-header .wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 55px;
+  }
+  .site-title { font-size: 26px; font-weight: 300; color: var(--text); letter-spacing: -.5px; }
+  .site-nav a { color: var(--text); margin-left: 20px; font-size: 15px; }
+  .site-nav a:hover { color: var(--link); }
+
+  .intro { display: flex; align-items: center; gap: 1.5em; margin: 44px 0 8px; }
+  .intro img { width: 120px; height: 120px; min-width: 120px; border-radius: 50%; object-fit: cover; }
+  .intro h1 { margin: 0 0 .35em; font-size: 30px; font-weight: 700; }
+  .intro .tag { margin: 0; font-size: 1.1em; color: #666; }
+  .lede { margin: 18px 0 40px; max-width: 60ch; color: #444; }
+
+  .eyebrow {
+    font-size: 12px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--grey); margin: 0 0 16px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    padding-bottom: 56px;
+  }
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 22px;
+    min-height: 200px;
+    overflow: hidden;
+    color: var(--text);
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0,0,0,.09);
+    border-color: var(--accent);
+  }
+  .card :where(.name, .desc, .go, .pills, .bars, .meta, .latest) { position: relative; z-index: 1; }
+
+  .card .dot {
+    display: inline-block; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--accent); margin-right: 9px; vertical-align: middle;
+  }
+  .card .name { font-size: 19px; font-weight: 600; margin: 0 0 6px; }
+  .card .desc { margin: 0; color: var(--grey); font-size: 14.5px; max-width: 30ch; }
+  .card .go { margin-top: auto; padding-top: 14px; font-size: 14px; color: var(--accent); font-weight: 600; }
+  .card .arrow { display: inline-block; transition: transform .15s; }
+  .card:hover .arrow { transform: translateX(4px); }
+
+  .card.tech { --accent: var(--tech); }
+  .card.tech .latest { margin: 12px 0 0; font-size: 13px; color: #555; line-height: 1.45; }
+  .card.tech .latest .lbl {
+    font-family: var(--mono); font-size: 10px; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--tech); margin-right: 7px;
+  }
+  .card.tech .pills { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 0; }
+  .card.tech .pills span {
+    font-family: var(--mono); font-size: 11px; color: var(--tech);
+    background: #eaf2fd; border-radius: 999px; padding: 4px 11px;
+  }
+
+  .card.random { --accent: var(--random); background: #fbf5ef; border-color: #efe2d6; }
+  .card.random .doodle {
+    position: absolute; right: -26px; bottom: -26px; width: 130px; height: 130px;
+    border-radius: 50%; z-index: 0; pointer-events: none;
+    background: radial-gradient(circle at 32% 30%, #f0d9c6, transparent 70%);
+  }
+
+  .card.playlists { --accent: var(--playlists); background: #121212; border-color: #1f1f1f; color: #fff; }
+  .card.playlists .name { color: #fff; }
+  .card.playlists .desc { color: #b3b3b3; }
+  .card.playlists .bars { display: flex; align-items: flex-end; gap: 5px; height: 30px; margin-bottom: 16px; }
+  .card.playlists .bars i { width: 6px; background: var(--playlists); border-radius: 3px; display: block; }
+  .card.playlists .bars i:nth-child(1){height:40%} .card.playlists .bars i:nth-child(2){height:82%}
+  .card.playlists .bars i:nth-child(3){height:55%} .card.playlists .bars i:nth-child(4){height:100%}
+  .card.playlists .bars i:nth-child(5){height:66%} .card.playlists .bars i:nth-child(6){height:34%}
+  .card.playlists .bars i:nth-child(7){height:72%}
+
+  .card.shop { --accent: var(--shop); background: #f2f2f3; border-color: #e2e2e4; }
+  .card.shop .corner { position: absolute; width: 11px; height: 11px; border: 1.5px solid var(--shop); opacity: .5; z-index: 0; }
+  .card.shop .corner.tl { top: 13px; left: 13px; border-right: 0; border-bottom: 0; }
+  .card.shop .corner.br { bottom: 13px; right: 13px; border-left: 0; border-top: 0; }
+  .card.shop .meta { font-family: var(--mono); font-size: 12px; color: var(--shop); margin: 12px 0 0; }
+
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding: 28px 0; color: var(--grey); font-size: 14px;
+  }
+  .site-footer .wrapper { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .site-footer a { color: var(--grey); }
+  .site-footer a:hover { color: var(--text); }
+  .site-footer .social a { margin-left: 16px; }
+
+  a:focus-visible, .card:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+
+  @media (max-width: 600px) {
+    .cards { grid-template-columns: 1fr; }
+    .intro { flex-direction: column; text-align: center; gap: 1em; }
+    .site-nav { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrapper">
+    <span class="site-title">{{ site.title }}</span>
+    <nav class="site-nav">
+      <a href="{{ '/tech/' | relative_url }}">Tech</a>
+      <a href="{{ '/random/' | relative_url }}">Random</a>
+      <a href="{{ '/playlists/' | relative_url }}">Playlists</a>
+      <a href="{{ '/shop/' | relative_url }}">Shop</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrapper">
+  <div class="intro">
+    <img src="/files/images/me-2.jpg" alt="Artur Magalhães">
+    <div>
+      <h1>Artur Magalhães</h1>
+      <p class="tag">May the force be with your models 👾</p>
+    </div>
+  </div>
+  <p class="lede">Applied Scientist at Amazon exploring the intersection of machine learning, curiosity, and life. Pick a place to start.</p>
+
+  <p class="eyebrow">Where to</p>
+  <div class="cards">
+    {%- assign latest_tech = site.posts | first -%}
+    <a class="card tech" href="{{ '/tech/' | relative_url }}">
+      <p class="name"><span class="dot"></span>Tech blog</p>
+      <p class="desc">Machine learning, research, and engineering notes.</p>
+      {%- if latest_tech -%}
+      <p class="latest"><span class="lbl">Latest</span>{{ latest_tech.title | escape }}</p>
+      {%- endif -%}
+      <div class="pills"><span>ml</span><span>research</span><span>engineering</span></div>
+      <span class="go">Read <span class="arrow">&rarr;</span></span>
+    </a>
+
+    <a class="card random" href="{{ '/random/' | relative_url }}">
+      <span class="doodle"></span>
+      <p class="name"><span class="dot"></span>Random blog</p>
+      <p class="desc">Life, curiosity, and whatever else I write.</p>
+      <span class="go">Read <span class="arrow">&rarr;</span></span>
+    </a>
+
+    <a class="card playlists" href="{{ '/playlists/' | relative_url }}">
+      <div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="name"><span class="dot"></span>Playlists</p>
+      <p class="desc">My favorite authorial playlists on Spotify.</p>
+      <span class="go">Listen <span class="arrow">&rarr;</span></span>
+    </a>
+
+    <a class="card shop" href="{{ '/shop/' | relative_url }}">
+      <i class="corner tl"></i><i class="corner br"></i>
+      <p class="name"><span class="dot"></span>Shop</p>
+      <p class="desc">My things for sale. Message me directly.</p>
+      <div class="meta">à venda · whatsapp</div>
+      <span class="go">Browse <span class="arrow">&rarr;</span></span>
+    </a>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrapper">
+    <span>Artur Magalhães</span>
+    <span class="social">
+      <a href="https://github.com/{{ site.github_username }}">GitHub</a>
+      <a href="https://www.linkedin.com/in/{{ site.linkedin_username }}">LinkedIn</a>
+      <a href="https://twitter.com/{{ site.twitter_username }}">Twitter</a>
+      <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+    </span>
+  </div>
+</footer>
+
+</body>
+</html>
