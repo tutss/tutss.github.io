@@ -1,28 +1,12 @@
+{%- assign is_playlists = false -%}
+{%- if page.url == "/playlists/" -%}{%- assign is_playlists = true -%}{%- endif -%}
+
 <header class="site-header" role="banner">
 
   <div class="wrapper">
-    {%- assign default_paths = site.pages | map: "path" -%}
-    {%- assign page_paths = site.header_pages | default: default_paths -%}
-    {%- assign is_playlists = false -%}
-    {%- if page.url == "/playlists/" -%}{%- assign is_playlists = true -%}{%- endif -%}
     <a class="site-title" rel="author" href="{{ "/" | relative_url }}">{{ site.title | escape }}</a>
-    {%- unless is_playlists -%}
-    <div class="extras-menu">
-      <button class="extras-toggle" aria-label="Extra pages" aria-expanded="false" onclick="this.parentElement.classList.toggle('open'); this.setAttribute('aria-expanded', this.parentElement.classList.contains('open'))">
-        <svg viewBox="0 0 18 15" width="16" height="13">
-          <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
-        </svg>
-      </button>
-      <div class="extras-dropdown">
-        <a href="{{ "/carnival/" | relative_url }}">carnival</a>
-        <a href="{{ "/life/" | relative_url }}">life</a>
-        <a href="{{ "/game/" | relative_url }}">game</a>
-        <a href="{{ "/metrics/" | relative_url }}">metrics</a>
-      </div>
-    </div>
-    {%- endunless -%}
 
-    {%- if page_paths -%}
+    {%- if is_playlists -%}
       <nav class="site-nav">
         <input type="checkbox" id="nav-trigger" class="nav-trigger" />
         <label for="nav-trigger">
@@ -32,22 +16,57 @@
             </svg>
           </span>
         </label>
-
         <div class="trigger">
-          {%- if is_playlists -%}
-            <a class="page-link" href="{{ "/" | relative_url }}">Blog</a>
-            <a class="page-link" href="{{ "/playlists/" | relative_url }}">Playlists</a>
-            <a class="page-link" href="{{ "/shop/" | relative_url }}">Shop</a>
-          {%- else -%}
+          <a class="page-link" href="{{ "/" | relative_url }}">Blog</a>
+          <a class="page-link" href="{{ "/playlists/" | relative_url }}">Playlists</a>
+          <a class="page-link" href="{{ "/shop/" | relative_url }}">Shop</a>
+        </div>
+      </nav>
+
+    {%- else -%}
+      {%- assign page_paths = site.header_pages -%}
+      <span class="header-menus">
+        <span class="hmenu">
+          <button type="button" class="hmenu-toggle" aria-haspopup="true" aria-expanded="false"
+            onclick="this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',this.parentElement.classList.contains('open'))">Pages<svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+          <div class="hmenu-list">
             {%- for path in page_paths -%}
               {%- assign my_page = site.pages | where: "path", path | first -%}
               {%- if my_page.title -%}
-              <a class="page-link" href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
+              <a href="{{ my_page.url | relative_url }}">{{ my_page.title | escape }}</a>
               {%- endif -%}
             {%- endfor -%}
-            <a class="page-link" href="{{ "/playlists/" | relative_url }}">Playlists</a>
-            <a class="page-link" href="{{ "/shop/" | relative_url }}">Shop</a>
-          {%- endif -%}
+          </div>
+        </span>
+
+        {%- if page.section == "tech" -%}
+        <span class="hmenu">
+          <button type="button" class="hmenu-toggle" aria-haspopup="true" aria-expanded="false"
+            onclick="this.parentElement.classList.toggle('open');this.setAttribute('aria-expanded',this.parentElement.classList.contains('open'))">Playgrounds<svg viewBox="0 0 10 6" width="9" height="6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+          <div class="hmenu-list">
+            <a href="{{ "/carnival/" | relative_url }}">Carnival</a>
+            <a href="{{ "/life/" | relative_url }}">Life</a>
+            <a href="{{ "/game/" | relative_url }}">Game</a>
+            <a href="{{ "/metrics/" | relative_url }}">Metrics</a>
+          </div>
+        </span>
+        {%- endif -%}
+      </span>
+
+      <nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+        <div class="trigger">
+          <a class="page-link" href="{{ "/tech/" | relative_url }}">Tech</a>
+          <a class="page-link" href="{{ "/random/" | relative_url }}">Random</a>
+          <a class="page-link" href="{{ "/playlists/" | relative_url }}">Playlists</a>
+          <a class="page-link" href="{{ "/shop/" | relative_url }}">Shop</a>
         </div>
       </nav>
     {%- endif -%}
@@ -55,69 +74,50 @@
 
 </header>
 
+{%- unless is_playlists -%}
 <style>
-.extras-menu {
-  position: relative;
-  display: inline-block;
-  vertical-align: baseline;
-  margin-left: 6px;
+.site-header .wrapper { display: flex; align-items: center; gap: 6px; }
+.site-header .wrapper::before,
+.site-header .wrapper::after { content: none; display: none; }
+.site-header .site-title { float: none; margin-right: 4px; }
+.site-header .site-nav { float: none; margin-left: auto; }
+
+.header-menus { display: inline-flex; gap: 2px; }
+.hmenu { position: relative; }
+.hmenu-toggle {
+  background: none; border: 0; padding: 4px 7px; cursor: pointer;
+  font-family: inherit; font-size: 15px; color: #424242;
+  display: inline-flex; align-items: center; gap: 5px;
 }
-.extras-toggle {
-  background: none;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  padding: 3px 6px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: background 0.15s;
-  position: relative;
-  top: 20px;
-  left: 4px;
+.hmenu-toggle:hover { color: #2a7ae2; }
+.hmenu-toggle svg { transition: transform .15s; }
+.hmenu.open .hmenu-toggle svg { transform: rotate(180deg); }
+.hmenu-list {
+  display: none; position: absolute; left: 0; top: calc(100% + 6px);
+  background: #fff; border: 1px solid #e8e8e8; border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.08); min-width: 165px; z-index: 100; padding: 4px 0;
 }
-.extras-toggle:hover {
-  background: #f0f0f0;
+.hmenu.open .hmenu-list { display: block; }
+.hmenu-list a {
+  display: block; padding: 7px 16px; color: #515151; font-size: 14px; text-decoration: none; line-height: 1.4;
 }
-.extras-toggle svg {
-  fill: #828282;
-}
-.extras-dropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  min-width: 140px;
-  z-index: 100;
-  padding: 4px 0;
-}
-.extras-menu.open .extras-dropdown {
-  display: block;
-}
-.extras-dropdown a {
-  display: block;
-  padding: 6px 14px;
-  color: #515151;
-  text-decoration: none;
-  font-size: 14px;
-  transition: background 0.15s, color 0.15s;
-}
-.extras-dropdown a:hover {
-  background: #f5f5f5;
-  color: #111;
+.hmenu-list a:hover { background: #f5f5f5; color: #111; }
+
+@media (max-width: 600px) {
+  .site-header .wrapper { gap: 2px; flex-wrap: wrap; }
+  .hmenu-toggle { font-size: 14px; padding: 4px 5px; }
+  .hmenu-list { left: auto; right: 0; }
 }
 </style>
-
 <script>
-document.addEventListener("click", function(e) {
-  document.querySelectorAll(".extras-menu.open").forEach(function(menu) {
+document.addEventListener("click", function (e) {
+  document.querySelectorAll(".hmenu.open").forEach(function (menu) {
     if (!menu.contains(e.target)) {
       menu.classList.remove("open");
-      menu.querySelector(".extras-toggle").setAttribute("aria-expanded", "false");
+      var toggle = menu.querySelector(".hmenu-toggle");
+      if (toggle) { toggle.setAttribute("aria-expanded", "false"); }
     }
   });
 });
 </script>
+{%- endunless -%}

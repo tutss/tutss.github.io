@@ -43,11 +43,39 @@ header_pages:
   - prompts.markdown
   - resume.markdown
 
+# Tech blog = posts (clean /tech/ URLs); Random blog = a collection
+permalink: /tech/:title/
+
+collections:
+  random:
+    output: true
+    permalink: /random/:title/
+
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      section: tech
+  - scope:
+      path: ""
+      type: random
+    values:
+      layout: post
+      section: random
+
+# Random blog RSS; the default /feed.xml carries the tech posts
+feed:
+  collections:
+    random:
+      path: /feed/random.xml
+
 # Build settings
 theme: minima
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
+  - jekyll-redirect-from
 
 # Exclude from processing.
 # The following items will not be processed, by default.

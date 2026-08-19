@@ -1,5 +1,7 @@
 ---
 layout: post
+redirect_from:
+  - /2024/03/02/primeiro_post.html
 title:  "Blog revamp"
 date:   2024-03-02 18:45:54 -0300
 ---
