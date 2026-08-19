@@ -1,5 +1,7 @@
 ---
 layout: post
+redirect_from:
+  - /python/research/multiprocessing/2025/09/11/multiprocessing-discovery.html
 title: "From (almost) one day to five minutes: multiprocessing"
 date: 2025-09-11 23:07:14 -0300
 categories: [python, research, multiprocessing]

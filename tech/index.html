@@ -1,0 +1,26 @@
+---
+layout: default
+title: Tech blog
+permalink: /tech/
+section: tech
+---
+<div class="home">
+  <h1 class="page-heading">Tech blog</h1>
+  <p style="color:#828282;margin:-8px 0 24px;">Machine learning, research, and engineering notes.</p>
+
+  {%- assign posts = site.posts -%}
+  <ul class="post-list">
+    {%- for post in posts -%}
+    <li>
+      <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+      <h3>
+        <a class="post-link" href="{{ post.url | relative_url }}">{{ post.title | escape }}</a>
+      </h3>
+    </li>
+    {%- endfor -%}
+  </ul>
+
+  <p class="feed-subscribe">
+    <a href="{{ '/feed.xml' | relative_url }}">subscribe via RSS</a>
+  </p>
+</div>
