@@ -31,3 +31,21 @@
     - ["Áudio", "Espacial personalizado"]
     - ["Resistência", "IP54"]
   images: ["/files/images/shop/airpods4-1.jpg", "/files/images/shop/airpods4-4.jpg", "/files/images/shop/airpods4-2.jpg", "/files/images/shop/airpods4-3.jpg"]
+
+- id: aw11
+  family: Apple Watch
+  title: Apple Watch Series 11 Rose
+  condition: usado
+  price: 3600
+  original: 5639
+  short: Usado uma única vez. Acompanha 7 bandas extras e carregador.
+  notes: Usado apenas uma vez. Ótimo para quem pratica esportes ou quer acompanhar treinos, corridas e saúde no dia a dia.
+  vendor: Apple Watch Series 11 com tela Retina sempre ativa, rastreamento avançado de saúde, fitness, possui GPS com acabamento Rosé.
+  specs:
+    - ["Tamanho da caixa", "42mm"]
+    - ["Conectividade", "GPS"]
+    - ["Cor", "Rose"]
+    - ["Bandas extras", "7"]
+    - ["Carregador", "Incluso"]
+    - ["Estado", "Usado uma vez"]
+  images: ["/files/images/shop/aw11-1.jpeg", "/files/images/shop/aw11-2.jpeg", "/files/images/shop/aw11-3.jpeg"]
