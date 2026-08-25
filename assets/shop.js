@@ -91,7 +91,7 @@
             '<span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent);font-family:var(--font-heading)">' + esc(vm.family) + "</span>" +
             '<span class="' + vm.condCls + '" style="flex:none">' + esc(vm.condLabel) + "</span>" +
           "</div>" +
-          '<div class="card-title" style="font-size:15px;line-height:1.2;min-height:36px">' + esc(vm.title) + "</div>" +
+          '<div class="card-title" style="font-size:15px;line-height:1.2">' + esc(vm.title) + "</div>" +
           '<div style="margin-top:auto;display:flex;flex-direction:column;gap:4px">' +
             (vm.hasDiscount
               ? '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
