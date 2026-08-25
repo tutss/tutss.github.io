@@ -64,7 +64,7 @@
       priceLabel: fmt(prod.price),
       originalLabel: hasDiscount ? fmt(prod.original) : "",
       hasDiscount: hasDiscount,
-      discountLabel: hasDiscount ? "-" + Math.round((1 - prod.price / prod.original) * 100) + "%" : "",
+      discountLabel: hasDiscount ? "-" + fmt(prod.original - prod.price) : "",
       condLabel: prod.condition === "novo" ? "Novo" : "Usado",
       condCls: prod.condition === "novo" ? "tag tag-accent" : "tag tag-neutral",
       short: prod.short || "",
@@ -91,10 +91,15 @@
             '<span style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-accent);font-family:var(--font-heading)">' + esc(vm.family) + "</span>" +
             '<span class="' + vm.condCls + '" style="flex:none">' + esc(vm.condLabel) + "</span>" +
           "</div>" +
-          '<div class="card-title" style="font-size:15px;line-height:1.2">' + esc(vm.title) + "</div>" +
-          '<div style="margin-top:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap">' +
+          '<div class="card-title" style="font-size:15px;line-height:1.2;min-height:36px">' + esc(vm.title) + "</div>" +
+          '<div style="margin-top:auto;display:flex;flex-direction:column;gap:4px">' +
+            (vm.hasDiscount
+              ? '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">' +
+                  '<span class="text-muted" style="font-size:12px;text-decoration:line-through">' + esc(vm.originalLabel) + "</span>" +
+                  '<span class="tag tag-accent" style="flex:none">' + esc(vm.discountLabel) + "</span>" +
+                "</div>"
+              : "") +
             '<span style="font-family:var(--font-heading);font-size:20px">' + esc(vm.priceLabel) + "</span>" +
-            (vm.hasDiscount ? '<span class="text-muted" style="font-size:12px;text-decoration:line-through">' + esc(vm.originalLabel) + "</span>" : "") +
           "</div>" +
           '<span style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-accent);font-family:var(--font-heading)">Ver detalhes →</span>' +
         "</div>" +

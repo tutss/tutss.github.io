@@ -69,7 +69,7 @@ sitemap: false
         </div>
       </div>
 
-      <div id="results-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:var(--space-4)"></div>
+      <div id="results-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:var(--space-4)"></div>
     </section>
 
     <!-- Detail view -->
@@ -88,7 +88,7 @@ sitemap: false
     <p>Ative o JavaScript para navegar a loja. Itens à venda:</p>
     <ul>
       {% for p in site.data.products %}
-      <li><strong>{{ p.title }}</strong> — R$ {{ p.price }} —
+      <li><strong>{{ p.title }}</strong> — R$ {{ p.price | replace: '.', ',' }} —
         <a href="https://wa.me/{{ site.shop.whatsapp }}?text={{ 'Olá Artur! Tenho interesse no ' | append: p.title | append: '. Ainda está disponível?' | url_encode }}">Comprar no WhatsApp</a>
       </li>
       {% endfor %}
