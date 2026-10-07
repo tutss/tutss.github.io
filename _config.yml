@@ -41,7 +41,6 @@ header_pages:
   - commands-and-tips.markdown
   - materials.markdown
   - prompts.markdown
-  - resume.markdown
 
 # Tech blog = posts (clean /tech/ URLs); Random blog = a collection
 permalink: /tech/:title/
