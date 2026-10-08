@@ -1,2 +1,5 @@
 _site*
 *DS_Store*
+
+# Resume kept locally but not published to the site
+files/cv_english_ds.pdf

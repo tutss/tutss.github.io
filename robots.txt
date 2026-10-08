@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /resume/
+Disallow: /files/cv_english_ds.pdf
