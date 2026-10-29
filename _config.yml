@@ -20,7 +20,6 @@
 
 title: tuts blog
 author: Artur Magalhães
-# email: 
 description: >- # this means to ignore newlines until "baseurl:"
   Exploring the intersection of machine learning,
   curiosity, and life. I write when inspiration strikes.
@@ -31,10 +30,6 @@ timezone: America/Sao_Paulo
 twitter_username: artmaga23
 github_username:  tutss
 linkedin_username: arturmrsantos
-
-# Shop (/shop) settings. Products live in _data/products.yml.
-shop:
-  whatsapp: "" # WhatsApp number (country + area + number, digits only)
 
 header_pages:
   - about.markdown
